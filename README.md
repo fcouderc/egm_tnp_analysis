@@ -88,12 +88,15 @@ The setting file includes all the necessary information for a given setup of fit
     * baseOutDir: the output directory (will be created by the fitter)
 
 **- Sample definition.**
+
     * tnpTreeDir: the directory in the tnpTree (different for phoID, eleID, reco, hlt)
     * samplesDef: these are the main info
-        - data: data ntuple
-	- mcNom: nominal MC sample
-	- mcAlt: MC for generator syst
-	- tagSel: usually same as nominal MC + different base cuts: check the tag selection syst
+
+        * data: data ntuple
+	* mcNom: nominal MC sample
+	* mcAlt: MC for generator syst
+	* tagSel: usually same as nominal MC + different base cuts: check the tag selection syst
+
      For each samples
      	  - name: sample nickanme, used when storing the results 
 	  - mcTruth: whether or not apply mcTruth when making histos
