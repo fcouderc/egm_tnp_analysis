@@ -20,41 +20,41 @@ The settings has always to be pass to the fitter like this
 This way different settings python can be setup or different WPs for instance
 
 
-Then the analysis is performed in several steps:
+# the different fitting steps
 1. Create the bining. To each bin is associated a cut that can be tuned bin by bin in the settings.py
-   # After setting up the settings.py check bins 
+   * After setting up the settings.py check bins 
    python tnpEGM_fitter.py settings.py  --checkBins
    
-   # if  you need additinal cuts for some bins (cleaning cuts), tune cuts in the settings.py, then recheck
-   # once satisfied, create the bining
+   * if  you need additinal cuts for some bins (cleaning cuts), tune cuts in the settings.py, then recheck
+   * once satisfied, create the bining
    python tnpEGM_fitter.py settings.py  --createBins
 
-   # CAUTION: when recreacting bins, the output directory is overwritten! So be sure to not redo that once really started
+   * CAUTION: when recreacting bins, the output directory is overwritten! So be sure to not redo that once really started
 
 2. Create the histograms with the different cuts... this is the longest step. Histogram will not be re-done later
    python tnpEGM_fitter.py settings.py --createHists
 
 3. Do your first step of fits:
-   # nominal fit
+   * nominal fit
    python tnpEGM_fitter.py settings.py --doFit
    
-   # MC fit for alternate signal parameter constrain 
+   * MC fit for alternate signal parameter constrain 
    python tnpEGM_fitter.py settings.py --doFit --mcSig --altSig
 
-   # Alternate signal fit (using constraints from previous fits)
+   * Alternate signal fit (using constraints from previous fits)
    python tnpEGM_fitter.py settings.py --doFit  --altSig
 
-   # Alternate background fit (using constraints from previous fits)
+   * Alternate background fit (using constraints from previous fits)
    python tnpEGM_fitter.py settings.py --doFit  --altBkg
 
 4. Check fits (there is a web index.php in the plot directory to vizualize from the web) and redo fit
-   # can redo a given bin only via 
-   # the bin number ib can be found from --checkBins or in the ouput dir (or web interface)
+   * can redo a given bin only via 
+   * the bin number ib can be found from --checkBins or in the ouput dir (or web interface)
    python tnpEGM_fitter.py settings.py --doFit --iBin ib
    
-   # the initial parameters can be tuned for this particular bin in the setting.py file. 
-   # Once the fit is good enough do not touch it or re-do all
-   # one can redo any kind of fit bin by bin for instance the MC with alt model
+   * the initial parameters can be tuned for this particular bin in the setting.py file. 
+   * Once the fit is good enough do not touch it or re-do all
+   * one can redo any kind of fit bin by bin for instance the MC with alt model
    python tnpEGM_fitter.py settings.py --doFit --mcSig --altSig --iBin ib
 
 5. Once all fits are fine, put everythin in the egm format txt file
