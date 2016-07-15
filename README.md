@@ -81,9 +81,11 @@ This way different settings python can be setup or different WPs for instance
 ## The setting file
 
 The setting file includes all the necessary information for a given setup of fit
+
 **- General settings.**
-     * flag: this is the Working point in the tnpTree  (pass: flag==1 ; fail flag==0)
-     * baseOutDir: the output directory (will be created by the fitter)
+
+    * flag: this is the Working point in the tnpTree  (pass: flag==1 ; fail flag==0)
+    * baseOutDir: the output directory (will be created by the fitter)
 
 **- Sample definition.**
     * tnpTreeDir: the directory in the tnpTree (different for phoID, eleID, reco, hlt)
