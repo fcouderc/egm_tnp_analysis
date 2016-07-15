@@ -97,13 +97,21 @@ The setting file includes all the necessary information for a given setup of fit
       - mcAlt: MC for generator syst
       - tagSel: usually same as nominal MC + different base cuts: check the tag selection syst
 
-     For each samples
-     	       - name: sample nickanme, used when storing the results 
+     For each sample
+     	       - name: sample nickanme, used when storing the result
 	       - mcTruth: whether or not apply mcTruth when making histos
 	       - cut: can have sample dependent cut but careful this is really mostly for the tag selection syst (or to restrict data in a given run range)
 	       - path: path to the tnp tree with inputs (can use eos as in the example settings.py, but need to mount eos dir then)
  
 
+**- Cuts.**
+
+    * cutBase: Define here the main cut
+    * additionalCuts: can be used for cleaning cuts (or put additionalCuts = None)
+
+**- Fitting parameters.**
+    
+    Define in this section the init parameters for the different fit, can be tuned to improve convergence.
 
 ====================
    
