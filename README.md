@@ -32,7 +32,7 @@ Help message:
 The settings has always to be pass to the fitter like this
 >    python tnpEGM_fitter.py settings.py
 
-This way different settings python can be setup or different WPs for instance
+Therefore several "settings.py" files  can be setup to do different WPs for instance
 
 
 ## The different fitting steps
