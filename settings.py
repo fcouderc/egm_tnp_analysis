@@ -1,9 +1,12 @@
 #############################################################
 ########## General settings
 #############################################################
-# flag to be Tested
-flag       = 'passingMedium'
-baseOutDir = 'resultsEleID/runB_p2/%s/' % (flag)
+# flag to be tested, can you complex cuts... like for the MVA
+flagMVA80 = '(( abs(probe_sc_eta) < 0.8 && probe_Ele_nonTrigMVA > %f ) ||  ( abs(probe_sc_eta) > 0.8 && abs(probe_sc_eta) < 1.479&& probe_Ele_nonTrigMVA > %f ) || ( abs(probe_sc_eta) > 1.479 && probe_Ele_nonTrigMVA > %f ) )' % (0.988153,0.967910,0.841729)
+
+### Loose electron ID as example
+flag       = { 'passingLoose' : '(passingLoose == 1)' }
+baseOutDir = 'resultsEleID/runB_p2/%s/' % (flag.keys()[0])
 
 #############################################################
 ########## samples definition  [can be nD bining]

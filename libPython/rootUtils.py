@@ -32,11 +32,11 @@ def makePassFailHistograms( info, bindef, var ):
             cuts = '%s && %s' % (cuts,info['cut'])
                 
         if info['isMC'] :
-            cutPass = '( %s && %s == 1 ) * %s ' % (cuts, info['flag'], info['weight'])
-            cutFail = '( %s && %s == 0 ) * %s ' % (cuts, info['flag'], info['weight'])
+            cutPass = '( %s &&  %s ) * %s ' % (cuts, info['flag'], info['weight'])
+            cutFail = '( %s && !%s ) * %s ' % (cuts, info['flag'], info['weight'])
         else:
-            cutPass = '( %s && %s == 1 )' % (cuts, info['flag'])
-            cutFail = '( %s && %s == 0 )' % (cuts, info['flag'])
+            cutPass = '( %s &&  %s )' % (cuts, info['flag'])
+            cutFail = '( %s && !%s )' % (cuts, info['flag'])
         
         tree.Draw('%s >> %s' % (var['name'],hPass[ib].GetName()),cutPass,'goff')
         tree.Draw('%s >> %s' % (var['name'],hFail[ib].GetName()),cutFail,'goff')

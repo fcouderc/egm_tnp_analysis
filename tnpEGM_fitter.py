@@ -65,10 +65,10 @@ if args.createHists:
         if sample['nEvts'] < 0 : isMC = False
         info = {
             'infile'  : sample['path'],
-            'outfile' : '%s/%s_%s.root' % ( tnpConf.baseOutDir ,sample['name'], tnpConf.flag ),
+            'outfile' : '%s/%s_%s.root' % ( tnpConf.baseOutDir ,sample['name'], tnpConf.flag.keys()[0] ),
             'tree'    : '%s/fitter_tree'% tnpConf.tnpTreeDir,
             'weight'  : tnpConf.weightName,
-            'flag'    : tnpConf.flag,
+            'flag'    : tnpConf.flag[tnpConf.flag.keys()[0]],
             'cut'     : sample['cut'],
             'mcTruth' : sample['mcTruth'],
             'isMC'    : isMC
@@ -101,16 +101,14 @@ if  args.doFit:
         isMC = False
         
     info = {
-        'infile' : '%s/%s_%s.root' % ( tnpConf.baseOutDir ,  sample['name'], tnpConf.flag ),
+        'infile'  : '%s/%s_%s.root' % ( tnpConf.baseOutDir ,  sample['name'], tnpConf.flag.keys()[0] ),
         'tree'    : '%s/fitter_tree'% tnpConf.tnpTreeDir,
-        'weight'  : tnpConf.weightName,
-        'flag'    : tnpConf.flag,
         'mcTruth' : sample['mcTruth'],
         'isMC'    : isMC,
         'mcRef'   : None
         }
 
-    info['mcRef'] = '%s/%s_%s.root' % ( tnpConf.baseOutDir ,  sampleMC['name'], tnpConf.flag )
+    info['mcRef'] = '%s/%s_%s.root' % ( tnpConf.baseOutDir ,  sampleMC['name'], tnpConf.flag.keys()[0] )
         
     if args.binNumber == -1:
         for ib in range(len(tnpBins['bins'])):
@@ -147,8 +145,7 @@ if  args.doPlot:
     isMC = True
     if sample['nEvts'] < 0 : isMC = False
     info = {
-        'outfile' : '%s/%s_%s.%s.root' % ( tnpConf.baseOutDir,sample['name'], tnpConf.flag,fitType ),
-        'flag'    : tnpConf.flag,
+        'outfile' : '%s/%s_%s.%s.root' % ( tnpConf.baseOutDir,sample['name'], tnpConf.flag.keys()[0],fitType ),
         'mcTruth' : sample['mcTruth'],
         'isMC'    : isMC,
         'plotDir' : plottingDir
@@ -169,18 +166,18 @@ if  args.doPlot:
 ####################################################################
 if args.sumUp:
     info = {
-        'dataNominal' : '%s/%s_%s.%s.root' % ( tnpConf.baseOutDir , tnpConf.samplesDef['data' ]['name'], tnpConf.flag, 'nominalFit' ),
-        'dataAltSig'  : '%s/%s_%s.%s.root' % ( tnpConf.baseOutDir , tnpConf.samplesDef['data' ]['name'], tnpConf.flag, 'altSigFit'  ),
-        'dataAltBkg'  : '%s/%s_%s.%s.root' % ( tnpConf.baseOutDir , tnpConf.samplesDef['data' ]['name'], tnpConf.flag, 'altBkgFit'  ),
-        'mcNominal'   : '%s/%s_%s.root' % ( tnpConf.baseOutDir , tnpConf.samplesDef['mcNom']['name'], tnpConf.flag ),
+        'dataNominal' : '%s/%s_%s.%s.root' % ( tnpConf.baseOutDir , tnpConf.samplesDef['data' ]['name'], tnpConf.flag.keys()[0], 'nominalFit' ),
+        'dataAltSig'  : '%s/%s_%s.%s.root' % ( tnpConf.baseOutDir , tnpConf.samplesDef['data' ]['name'], tnpConf.flag.keys()[0], 'altSigFit'  ),
+        'dataAltBkg'  : '%s/%s_%s.%s.root' % ( tnpConf.baseOutDir , tnpConf.samplesDef['data' ]['name'], tnpConf.flag.keys()[0], 'altBkgFit'  ),
+        'mcNominal'   : '%s/%s_%s.root' % ( tnpConf.baseOutDir , tnpConf.samplesDef['mcNom']['name'], tnpConf.flag.keys()[0] ),
         'mcAlt'       : None,
         'tagSel'      : None
         }
 
     if not tnpConf.samplesDef['mcAlt' ] is None:
-        info['mcAlt'    ] = '%s/%s_%s.root'  % ( tnpConf.baseOutDir , tnpConf.samplesDef['mcAlt' ]['name'] , tnpConf.flag )
+        info['mcAlt'    ] = '%s/%s_%s.root'  % ( tnpConf.baseOutDir , tnpConf.samplesDef['mcAlt' ]['name'] , tnpConf.flag.keys()[0] )
     if not tnpConf.samplesDef['tagSel'] is None:
-        info['tagSel'   ] = '%s/%s_%s.root'  % ( tnpConf.baseOutDir , tnpConf.samplesDef['tagSel']['name'] , tnpConf.flag )
+        info['tagSel'   ] = '%s/%s_%s.root'  % ( tnpConf.baseOutDir , tnpConf.samplesDef['tagSel']['name'] , tnpConf.flag.keys()[0] )
 
     effis = None
     effFileName ='%s/egammaEffi.txt' % tnpConf.baseOutDir 
