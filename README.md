@@ -20,6 +20,7 @@ Package to handle analysis of tnp trees. The main tool is the python fitter
 The interface between the user and the fitter is solely done via the settings file
 
    ===> settings.py
+
    	- set the different samples and location
 	- set the fitting bins
 	- set the different cuts to be used
