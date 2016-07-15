@@ -1,6 +1,17 @@
 # egm_tnp_analysis
 
 
+## Install
+
+> git clone git@github.com:fcouderc/egm_tnp_analysis.git .
+> cd egm_tnp_analysis
+
+no compilation is required (this will auto compile the C++ code automatically) but you need ROOT and RooFit installed (cmsenv in a release would do).
+
+This can be run on a laptop, does not require cmssw environment
+
+## Quick description
+
 Package to handle analysis of tnp trees. The main tool is the python fitter
 
    ===> tnpEGM_fitter.py
