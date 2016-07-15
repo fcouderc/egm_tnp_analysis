@@ -22,7 +22,7 @@ The settings has always to be pass to the fitter like this
 This way different settings python can be setup or different WPs for instance
 
 
-## the different fitting steps
+## The different fitting steps
 
 **1. Create the bining.** To each bin is associated a cut that can be tuned bin by bin in the settings.py
    * After setting up the settings.py check bins 
