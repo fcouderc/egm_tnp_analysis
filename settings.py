@@ -1,12 +1,9 @@
 #############################################################
 ########## General settings
 #############################################################
-# flag to be tested, can you complex cuts... like for the MVA
-flagMVA80 = '(( abs(probe_sc_eta) < 0.8 && probe_Ele_nonTrigMVA > %f ) ||  ( abs(probe_sc_eta) > 0.8 && abs(probe_sc_eta) < 1.479&& probe_Ele_nonTrigMVA > %f ) || ( abs(probe_sc_eta) > 1.479 && probe_Ele_nonTrigMVA > %f ) )' % (0.988153,0.967910,0.841729)
-
-### Loose electron ID as example
-flag       = { 'passingLoose' : '(passingLoose == 1)' }
-baseOutDir = 'resultsEleID/runB_p2/%s/' % (flag.keys()[0])
+# flag to be Tested
+flag       = 'passingMedium'
+baseOutDir = 'histograms/%s/' % (flag)
 
 #############################################################
 ########## samples definition  [can be nD bining]
@@ -18,16 +15,14 @@ weightName = 'totWeight'
 ## some sample based cuts... general cuts defined here after
 cutAltSel = 'tag_Ele_pt > 33  && tag_Ele_nonTrigMVA > 0.90'
 cutData   = 'run >= 273726' 
-direos    = 'eos/cms/store/group/phys_egamma/tnp/80X/Photons_76Xids/elev2/'
 samplesDef = {
-    'data'      : { 'name' : 'data_2016_runB'     , 'mcTruth' : False, 'nEvts':       -1, 'cut' : cutData,
-                    'path' : '%s/data/TnPTree_SingleElectron_2016_RunB.root' % direos  },
+    'data'      : { 'name' :  'data_2016_runB_p2' , 'mcTruth' : False, 'nEvts':       -1, 'cut' : cutData,
+                    'path' : '../data/TnPTree_SingleElectron_2016_RunB.root'  },
     'mcNom'     : { 'name' : 'mcMadgraph80XNom'   , 'mcTruth' : True , 'nEvts': 36311064, 'cut' : None,
-                    'path' : '%s/mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root' % direos },
-    'mcAlt'     : { 'name' : 'mcAtNLO80XNom'      , 'mcTruth' : True , 'nEvts': 36311064, 'cut' : None,
-                    'path' : '%s/mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.root'% direos },
+                    'path' : '../data/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root'  },
+    'mcAlt'     : None,
     'tagSel'    : { 'name' : 'mcMadgraph80XAltSel', 'mcTruth' : True , 'nEvts': 36311064, 'cut': cutAltSel,
-                    'path' : '%s/mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root' % direos },
+                    'path' : '../data/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root'  },
 }
 
 ### lumi in /fb
@@ -37,7 +32,7 @@ lumi = 5.657
 ########## bining definition  [can be nD bining]
 #############################################################
 biningDef = [
-   { 'var' : 'probe_sc_eta' , 'type': 'float', 'bins': [-2.5,-2.0,-1.566,-1.4442, -0.8, 0.0, 0.8, 1.4442, 1.566, 2.0, 2.5] },
+   { 'var' : 'probe_sc_eta' , 'type': 'float', 'bins': [-2.5,-2.0,-1.566,-1.442, -1.0, 0.0, 1.0, 1.442, 1.566, 2.0, 2.5] },
    { 'var' : 'probe_Ele_pt' , 'type': 'float', 'bins': [10,20.0,30,40,50,200] },
 ]
 

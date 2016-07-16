@@ -29,7 +29,7 @@ The interface between the user and the fitter is solely done via the settings fi
 Help message:
 >    python tnpEGM_fitter.py --help 
 
-The settings has always to be pass to the fitter like this
+The settings have always to be passed to the fitter
 >    python tnpEGM_fitter.py settings.py
 
 Therefore several "settings.py" files  can be setup to do different WPs for instance
@@ -47,18 +47,18 @@ Therefore several "settings.py" files  can be setup to do different WPs for inst
 
 >   python tnpEGM_fitter.py settings.py  --createBins
 
-   * CAUTION: when recreacting bins, the output directory is overwritten! So be sure to not redo that once really started
+   * CAUTION: when recreacting bins, the output directory is overwritten! So be sure to not redo that once you are at step2
 
-**2. Create the histograms** with the different cuts... this is the longest step. Histogram will not be re-done later
+**2. Create the histograms** with the different cuts... this is the longest step. Histograms will not be re-done later
    
 >   python tnpEGM_fitter.py settings.py --createHists
 
-**3. Do your first step of fits.**
+**3. Do your first round of fits.**
    * nominal fit
    
 >   python tnpEGM_fitter.py settings.py --doFit
    
-   * MC fit for alternate signal parameter constrain 
+   * MC fit to constrain alternate signal parameters [note this is the only MC fit that makes sense]
    
 >   python tnpEGM_fitter.py settings.py --doFit --mcSig --altSig
 
@@ -70,34 +70,36 @@ Therefore several "settings.py" files  can be setup to do different WPs for inst
    
 >   python tnpEGM_fitter.py settings.py --doFit  --altBkg
 
-**4. Check fits.** (there is a web index.php in the plot directory to vizualize from the web) and redo fit
-   * can redo a given bin only via 
-     the bin number ib can be found from --checkBins or in the ouput dir (or web interface)
+**4. Check fits and redo failed ones.** (there is a web index.php in the plot directory to vizualize from the web)
+   * can redo a given bin using its bin number ib. 
+     The bin number can be found from --checkBins, directly in the ouput dir (or web interface)
 
 >   python tnpEGM_fitter.py settings.py --doFit --iBin ib
    
-   * the initial parameters can be tuned for this particular bin in the setting.py file. 
-      Once the fit is good enough do not touch it do not redo all fits.
-      One can redo any kind of fit bin by bin for instance the MC with alt model
+   * the initial parameters can be tuned for this particular bin in the settings.py file. 
+      Once the fit is good enough, do not redo all fits, just fix next failed fit.
+      One can redo any kind of fit bin by bin. For instance the MC with altSig fit (if the constraint parameters were bad in the altSig for instance)
 
 >   python tnpEGM_fitter.py settings.py --doFit --mcSig --altSig --iBin ib
 
-**5. egm txt ouput file.** Once all fits are fine, put everythin in the egm format txt file
+**5. egm txt ouput file.** Once all fits are fine, put everything in the egm format txt file
 
 >   python tnpEGM_fitter.py --sumUp
    
-**6. Official egm output.** One can then do all the egm official control plots
+**6. Official egm output.** (Optional) One can then do all the egm official plots
 
 >  python libPython/EGammaID_scaleFactors.py  <egamma.txtfile from step 5>
 
 
-## The setting file
+## The settings file
 
-The setting file includes all the necessary information for a given setup of fit
+The settings file includes all the necessary information for a given setup of fit
 
 **- General settings.**
 
-    * flag: this is the Working point in the tnpTree  (pass: flag==1 ; fail flag==0)
+    * flag: this is the Working point in the tnpTree  (pass: flagCut ; fail !flagCut). Can handle complex flags:
+> flag = { 'flagNickName' : flagCutString } 
+
     * baseOutDir: the output directory (will be created by the fitter)
 
 **- Sample definition.**
@@ -111,7 +113,8 @@ The setting file includes all the necessary information for a given setup of fit
       - tagSel: usually same as nominal MC + different base cuts: check the tag selection syst
 
      For each sample
-     	       - name: sample nickanme, used when storing the result
+     	       
+	       - name: sample nickanme, used when storing the result
 	       - mcTruth: whether or not apply mcTruth when making histos
 	       - cut: can have sample dependent cut but careful this is really mostly for the tag selection syst (or to restrict data in a given run range)
 	       - path: path to the tnp tree with inputs (can use eos as in the example settings.py, but need to mount eos dir then)
