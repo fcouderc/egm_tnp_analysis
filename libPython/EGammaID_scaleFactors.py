@@ -12,7 +12,7 @@ import efficiencyUtils as effUtil
 tdrstyle.setTDRStyle()
 
 
-CMS_lumi.lumi_13TeV = "2.6 fb^{-1}"
+CMS_lumi.lumi_13TeV = "5.5 fb^{-1}"
 CMS_lumi.writeExtraText = 1
 CMS_lumi.lumi_sqrtS = "13 TeV"
 
@@ -322,10 +322,10 @@ EffiGraph1D( effGraph.pt_1DGraph_list(False) , effGraph.pt_1DGraph_list(True) , 
 EffiGraph1D( effGraph.eta_1DGraph_list(False), effGraph.eta_1DGraph_list(True), True , pdfout )
 
 #cDummy.Print( pdfout + "]" )
-#sys.exit(0)
 
 h2SF    = effGraph.ptEtaScaleFactor_2DHisto(-1)
 h2Error = effGraph.ptEtaScaleFactor_2DHisto( 0)  ## only error bars
+
 rt.gStyle.SetPalette(1)
 rt.gStyle.SetPaintTextFormat('1.3f');
 rt.gStyle.SetOptTitle(1)
@@ -340,6 +340,7 @@ c2D.GetPad(2).SetLeftMargin( 0.15)
 c2D.GetPad(2).SetTopMargin(  0.10)
 c2D.GetPad(1).SetLogy()
 c2D.GetPad(2).SetLogy()
+
 
 c2D.cd(1)
 dmin = 1.0 - h2SF.GetMinimum()
@@ -356,6 +357,7 @@ h2Error.SetMaximum(min(h2Error.GetMaximum(),0.2))
 h2Error.DrawCopy("colz TEXT45")
 
 c2D.Print( pdfout )
+
 
 rootout = rt.TFile(nameOutBase + '_SF2D.root','recreate')
 rootout.cd()

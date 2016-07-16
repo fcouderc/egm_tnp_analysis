@@ -185,6 +185,7 @@ class efficiencyList:
                         effMinus =  self.effList[ptBin][etaBinMinus] 
 
                     if effMinus is None:
+                        self.effList[ptBin][etaBinMinus] = effPlus
                         print " ---- efficiencyList: I did not find -eta bin!!!"
                     else:
                         #### fix statistical errors if needed
@@ -233,22 +234,25 @@ class efficiencyList:
                 ybins.append(ptBin[0])                
             if not ptBin[1] in ybins:
                 ybins.append(ptBin[1])
-                
+
             for etaBin in self.effList[ptBin].keys():
                 if not etaBin[0] in xbins:
                     xbins.append(etaBin[0])                
                 if not etaBin[1] in xbins:
                     xbins.append(etaBin[1])
+
         xbins.sort()
         ybins.sort()
         ## transform to numpy array for ROOT
         xbinsTab = np.array(xbins)
         ybinsTab = np.array(ybins)
+
         htitle = 'e/#gamma scale factors'
         hname  = 'h2_scaleFactorsEGamma' 
         if onlyError >= 0:
             htitle = 'e/#gamma uncertainties'
             hname  = 'h2_uncertaintiesEGamma'             
+
         h2 = rt.TH2F(hname,htitle,xbinsTab.size-1,xbinsTab,ybinsTab.size-1,ybinsTab)
 
         ## init histogram efficiencies and errors to 100%
@@ -257,11 +261,11 @@ class efficiencyList:
                 h2.SetBinContent(ix,iy, 1)
                 h2.SetBinError  (ix,iy, 1)
         
-        
         for ix in range(1,h2.GetXaxis().GetNbins()+1):
             for iy in range(1,h2.GetYaxis().GetNbins()+1):
 
                 for ptBin in self.effList.keys():
+                    print ptBin
                     if h2.GetYaxis().GetBinLowEdge(iy) < ptBin[0] or h2.GetYaxis().GetBinUpEdge(iy) > ptBin[1]:
                         continue
                     for etaBin in self.effList[ptBin].keys():
@@ -283,7 +287,6 @@ class efficiencyList:
                             print " ---- efficiencyList: I did not find -eta bin!!!"
                         else:                        
                             averageMC   = (effPlus.effMC   + effMinus.effMC  )/2.
-                       
                         ### so this is h2D bin is inside the bining used by e/gamma POG
                         h2.SetBinContent(ix,iy, self.effList[ptBin][etaBin].effData      / self.effList[ptBin][etaBin].effMC)
                         h2.SetBinError  (ix,iy, self.effList[ptBin][etaBin].systCombined / averageMC )
@@ -295,10 +298,8 @@ class efficiencyList:
                                 denominator = self.effList[ptBin][etaBin].systCombined
                             h2.SetBinContent(ix,iy, abs(self.effList[ptBin][etaBin].syst[onlyError-1]) / denominator )
 
-
         h2.GetXaxis().SetTitle("SuperCluster #eta")
         h2.GetYaxis().SetTitle("p_{T} [GeV]")
-        
         return h2
         
                                 
