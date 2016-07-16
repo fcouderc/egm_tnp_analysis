@@ -12,18 +12,22 @@ def createWorkspaceForAltSig( info,  tnpBin, tnpWorkspaceParam ):
 
     ### tricky: use n < 0 for high pT bin (so need to remove param and add it back)
     cbNList = ['nP','nF']
+    ptMin = -1
     if tnpBin['name'].find('pt_') >= 0:
         ptMin = float(tnpBin['name'].split('pt_')[1].split('p')[0])
-        if ptMin >= 35 :
-            for par in cbNList:
-                for ip in range(len(tnpWorkspaceParam)):
-                    x=re.compile('%s.*?' % par)
-                    listToRM = filter(x.match, tnpWorkspaceParam)
-                    for ir in listToRM :
-                        print '**** remove', ir
-                        tnpWorkspaceParam.remove(ir)
+    elif tnpBin['name'].find('et_') >= 0:
+        ptMin = float(tnpBin['name'].split('et_')[1].split('p')[0])
+    
+    if ptMin >= 35 :
+        for par in cbNList:
+            for ip in range(len(tnpWorkspaceParam)):
+                x=re.compile('%s.*?' % par)
+                listToRM = filter(x.match, tnpWorkspaceParam)
+                for ir in listToRM :
+                    print '**** remove', ir
+                    tnpWorkspaceParam.remove(ir)
                     
-                tnpWorkspaceParam.append( '%s[-1,-3,-0.005]' % (par) )
+            tnpWorkspaceParam.append( '%s[-1,-3,-0.005]' % (par) )
 
                 
         
