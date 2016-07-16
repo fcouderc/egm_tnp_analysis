@@ -265,7 +265,6 @@ class efficiencyList:
             for iy in range(1,h2.GetYaxis().GetNbins()+1):
 
                 for ptBin in self.effList.keys():
-                    print ptBin
                     if h2.GetYaxis().GetBinLowEdge(iy) < ptBin[0] or h2.GetYaxis().GetBinUpEdge(iy) > ptBin[1]:
                         continue
                     for etaBin in self.effList[ptBin].keys():
