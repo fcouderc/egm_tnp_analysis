@@ -1,7 +1,7 @@
 import ROOT as rt
-rt.gROOT.LoadMacro('libCpp/histFitter.C+')
-rt.gROOT.LoadMacro('libCpp/RooCBExGaussShape.cc+')
-rt.gROOT.LoadMacro('libCpp/RooCMSShape.cc+')
+rt.gROOT.LoadMacro('./libCpp/histFitter.C+')
+rt.gROOT.LoadMacro('./libCpp/RooCBExGaussShape.cc+')
+rt.gROOT.LoadMacro('./libCpp/RooCMSShape.cc+')
 rt.gROOT.SetBatch(1)
 
 from ROOT import tnpFitter
