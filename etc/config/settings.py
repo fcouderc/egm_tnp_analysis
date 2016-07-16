@@ -6,8 +6,15 @@ cutpass80 = '(( abs(probe_sc_eta) < 0.8 && probe_Ele_nonTrigMVA > %f ) ||  ( abs
 cutpass90 = '(( abs(probe_sc_eta) < 0.8 && probe_Ele_nonTrigMVA > %f ) ||  ( abs(probe_sc_eta) > 0.8 && abs(probe_sc_eta) < 1.479&& probe_Ele_nonTrigMVA > %f ) || ( abs(probe_sc_eta) > 1.479 && probe_Ele_nonTrigMVA > %f ) )' % (0.972153,0.922126,0.610764)
 
 # flag to be Tested
-flag       = { 'passingMedium' : 'passingMedium == 1' }
-baseOutDir = 'results/runB/%s/' % (flag.keys()[0])
+flags = {
+    'passingVeto'   : '(passingVeto   == 1)',
+    'passingLoose'  : '(passingLoose  == 1)',
+    'passingMedium' : '(passingMedium == 1)',
+    'passingTight'  : '(passingTight  == 1)',
+    'passingMVA80'  : cutpass80,
+    'passingMVA90'  : cutpass90,
+    }
+baseOutDir = 'results/runB/'
 
 #############################################################
 ########## samples definition  [can be nD bining]

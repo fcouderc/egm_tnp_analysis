@@ -8,16 +8,17 @@ import shutil
 
 
 parser = argparse.ArgumentParser(description='tnp EGM fitter')
-parser.add_argument('--checkBins'  , action='store_true'  , help='check  bining definition')
-parser.add_argument('--createBins' , action='store_true'  , help='create bining definition')
-parser.add_argument('--createHists', action='store_true'  , help='create histograms')
-parser.add_argument('--altSig'     , action='store_true'  , help='alternate signal model fit')
-parser.add_argument('--altBkg'     , action='store_true'  , help='alternate background model fit')
-parser.add_argument('--doFit'      , action='store_true'  , help='fit sample (sample should be defined in settings.py)')
-parser.add_argument('--mcSig'      , action='store_true'  , help='fit MC nom [to init fit parama]')
-parser.add_argument('--doPlot'     , action='store_true'  , help='plotting')
-parser.add_argument('--sumUp'      , action='store_true'  , help='sum up efficiencies')
+parser.add_argument('--checkBins'  , action='store_true'  , help = 'check  bining definition')
+parser.add_argument('--createBins' , action='store_true'  , help = 'create bining definition')
+parser.add_argument('--createHists', action='store_true'  , help = 'create histograms')
+parser.add_argument('--altSig'     , action='store_true'  , help = 'alternate signal model fit')
+parser.add_argument('--altBkg'     , action='store_true'  , help = 'alternate background model fit')
+parser.add_argument('--doFit'      , action='store_true'  , help = 'fit sample (sample should be defined in settings.py)')
+parser.add_argument('--mcSig'      , action='store_true'  , help = 'fit MC nom [to init fit parama]')
+parser.add_argument('--doPlot'     , action='store_true'  , help = 'plotting')
+parser.add_argument('--sumUp'      , action='store_true'  , help = 'sum up efficiencies')
 parser.add_argument('--iBin'       , dest = 'binNumber'   , type = int,  default=-1, help='bin number (to refit individual bin)')
+parser.add_argument('--flag'       , default = None       , help ='default is None')
 parser.add_argument('settings'     , default = None       , help = 'setting file [mandatory]')
 
 args = parser.parse_args()
@@ -26,6 +27,22 @@ print '===> settings %s <===' % args.settings
 importSetting = 'import %s as tnpConf' % args.settings.replace('/','.').split('.py')[0]
 print importSetting
 exec(importSetting)
+
+if args.flag is None:
+    print 'flag is MANDATORY, this is the working point as defined in the settings.py'
+    sys.exit(0)
+    
+if not args.flag in tnpConf.flags.keys() :
+    print 'flag %s not found in flags definitions' % args.flag
+    print '  --> define in settings first'
+    print '  In settings I found flags: '
+    print tnpConf.flags
+    sys.exit(0)
+
+outputDirectory = '%s/%s/' % (tnpConf.baseOutDir,args.flag)
+
+print '===>  Output directory: '
+print outputDirectory
 
 ### tnp library
 import libPython.binUtils  as tnpBiner
@@ -42,18 +59,18 @@ if args.checkBins:
     sys.exit(0)
     
 if args.createBins:
-    if os.path.exists( tnpConf.baseOutDir ):
-            shutil.rmtree( tnpConf.baseOutDir )
-    os.makedirs( tnpConf.baseOutDir )
+    if os.path.exists( outputDirectory ):
+            shutil.rmtree( outputDirectory )
+    os.makedirs( outputDirectory )
     tnpBins = tnpBiner.createBins(tnpConf.biningDef,tnpConf.cutBase)
     tnpBiner.tuneCuts( tnpBins, tnpConf.additionalCuts )
-    pickle.dump( tnpBins, open( '%s/bining.pkl'%(tnpConf.baseOutDir),'wb') )
-    print 'created dir: %s ' % tnpConf.baseOutDir
+    pickle.dump( tnpBins, open( '%s/bining.pkl'%(outputDirectory),'wb') )
+    print 'created dir: %s ' % outputDirectory
     print 'bining created successfully... '
-    print 'Note than any additional call to createBins will overwrite directory %s' % tnpConf.baseOutDir
+    print 'Note than any additional call to createBins will overwrite directory %s' % outputDirectory
     sys.exit(0)
 
-tnpBins = pickle.load( open( '%s/bining.pkl'%(tnpConf.baseOutDir),'rb') )
+tnpBins = pickle.load( open( '%s/bining.pkl'%(outputDirectory),'rb') )
 
 ####################################################################
 ##### Create Histograms
@@ -67,10 +84,10 @@ if args.createHists:
         if sample['nEvts'] < 0 : isMC = False
         info = {
             'infile'  : sample['path'],
-            'outfile' : '%s/%s_%s.root' % ( tnpConf.baseOutDir ,sample['name'], tnpConf.flag.keys()[0] ),
+            'outfile' : '%s/%s_%s.root' % ( outputDirectory ,sample['name'], args.flag ),
             'tree'    : '%s/fitter_tree'% tnpConf.tnpTreeDir,
             'weight'  : tnpConf.weightName,
-            'flag'    : tnpConf.flag[tnpConf.flag.keys()[0]],
+            'flag'    : tnpConf.flags[args.flag],
             'cut'     : sample['cut'],
             'mcTruth' : sample['mcTruth'],
             'isMC'    : isMC
@@ -103,14 +120,14 @@ if  args.doFit:
         isMC = False
         
     info = {
-        'infile'  : '%s/%s_%s.root' % ( tnpConf.baseOutDir ,  sample['name'], tnpConf.flag.keys()[0] ),
+        'infile'  : '%s/%s_%s.root' % ( outputDirectory ,  sample['name'], args.flag ),
         'tree'    : '%s/fitter_tree'% tnpConf.tnpTreeDir,
         'mcTruth' : sample['mcTruth'],
         'isMC'    : isMC,
         'mcRef'   : None
         }
 
-    info['mcRef'] = '%s/%s_%s.root' % ( tnpConf.baseOutDir ,  sampleMC['name'], tnpConf.flag.keys()[0] )
+    info['mcRef'] = '%s/%s_%s.root' % ( outputDirectory ,  sampleMC['name'], args.flag )
         
     if args.binNumber == -1:
         for ib in range(len(tnpBins['bins'])):
@@ -139,7 +156,7 @@ if  args.doPlot:
     if args.altSig : fitType = 'altSigFit'
     if args.altBkg : fitType = 'altBkgFit'
         
-    plottingDir = '%s/plots/%s/%s' % (tnpConf.baseOutDir,sample['name'],fitType)
+    plottingDir = '%s/plots/%s/%s' % (outputDirectory,sample['name'],fitType)
     if not os.path.exists( plottingDir ):
         os.makedirs( plottingDir )
     shutil.copy('etc/inputs/index.php.listPlots','%s/index.php' % plottingDir)
@@ -147,7 +164,7 @@ if  args.doPlot:
     isMC = True
     if sample['nEvts'] < 0 : isMC = False
     info = {
-        'outfile' : '%s/%s_%s.%s.root' % ( tnpConf.baseOutDir,sample['name'], tnpConf.flag.keys()[0],fitType ),
+        'outfile' : '%s/%s_%s.%s.root' % ( outputDirectory,sample['name'], args.flag, fitType ),
         'mcTruth' : sample['mcTruth'],
         'isMC'    : isMC,
         'plotDir' : plottingDir
@@ -168,21 +185,21 @@ if  args.doPlot:
 ####################################################################
 if args.sumUp:
     info = {
-        'dataNominal' : '%s/%s_%s.%s.root' % ( tnpConf.baseOutDir , tnpConf.samplesDef['data' ]['name'], tnpConf.flag.keys()[0], 'nominalFit' ),
-        'dataAltSig'  : '%s/%s_%s.%s.root' % ( tnpConf.baseOutDir , tnpConf.samplesDef['data' ]['name'], tnpConf.flag.keys()[0], 'altSigFit'  ),
-        'dataAltBkg'  : '%s/%s_%s.%s.root' % ( tnpConf.baseOutDir , tnpConf.samplesDef['data' ]['name'], tnpConf.flag.keys()[0], 'altBkgFit'  ),
-        'mcNominal'   : '%s/%s_%s.root' % ( tnpConf.baseOutDir , tnpConf.samplesDef['mcNom']['name'], tnpConf.flag.keys()[0] ),
+        'dataNominal' : '%s/%s_%s.%s.root' % ( outputDirectory , tnpConf.samplesDef['data' ]['name'], args.flag, 'nominalFit' ),
+        'dataAltSig'  : '%s/%s_%s.%s.root' % ( outputDirectory , tnpConf.samplesDef['data' ]['name'], args.flag, 'altSigFit'  ),
+        'dataAltBkg'  : '%s/%s_%s.%s.root' % ( outputDirectory , tnpConf.samplesDef['data' ]['name'], args.flag, 'altBkgFit'  ),
+        'mcNominal'   : '%s/%s_%s.root'    % ( outputDirectory , tnpConf.samplesDef['mcNom']['name'], args.flag ),
         'mcAlt'       : None,
         'tagSel'      : None
         }
 
     if not tnpConf.samplesDef['mcAlt' ] is None:
-        info['mcAlt'    ] = '%s/%s_%s.root'  % ( tnpConf.baseOutDir , tnpConf.samplesDef['mcAlt' ]['name'] , tnpConf.flag.keys()[0] )
+        info['mcAlt'    ] = '%s/%s_%s.root'  % ( outputDirectory , tnpConf.samplesDef['mcAlt' ]['name'] , args.flag )
     if not tnpConf.samplesDef['tagSel'] is None:
-        info['tagSel'   ] = '%s/%s_%s.root'  % ( tnpConf.baseOutDir , tnpConf.samplesDef['tagSel']['name'] , tnpConf.flag.keys()[0] )
+        info['tagSel'   ] = '%s/%s_%s.root'  % ( outputDirectory , tnpConf.samplesDef['tagSel']['name'] , args.flag )
 
     effis = None
-    effFileName ='%s/egammaEffi.txt' % tnpConf.baseOutDir 
+    effFileName ='%s/egammaEffi.txt' % outputDirectory 
     fOut = open( effFileName,'w')
     
     for ib in range(len(tnpBins['bins'])):
