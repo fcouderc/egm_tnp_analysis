@@ -3,7 +3,7 @@
 
 ## Install
 
-> git clone git@github.com:fcouderc/egm_tnp_analysis.git .
+> git clone  -b egm_fitter_ichep2016_v1 git@github.com:fcouderc/egm_tnp_analysis.git .
 
 > cd egm_tnp_analysis
 
