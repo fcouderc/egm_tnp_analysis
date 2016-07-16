@@ -21,8 +21,10 @@ parser.add_argument('--iBin'       , dest = 'binNumber'   , type = int,  default
 parser.add_argument('settings'     , default = None       , help = 'setting file [mandatory]')
 
 args = parser.parse_args()
-print args
-importSetting = 'import %s as tnpConf' % args.settings.split('.py')[0]
+
+print '===> settings %s <===' % args.settings
+importSetting = 'import %s as tnpConf' % args.settings.replace('/','.').split('.py')[0]
+print importSetting
 exec(importSetting)
 
 ### tnp library
@@ -140,7 +142,7 @@ if  args.doPlot:
     plottingDir = '%s/plots/%s/%s' % (tnpConf.baseOutDir,sample['name'],fitType)
     if not os.path.exists( plottingDir ):
         os.makedirs( plottingDir )
-    shutil.copy('data/index.php.listPlots','%s/index.php' % plottingDir)
+    shutil.copy('etc/inputs/index.php.listPlots','%s/index.php' % plottingDir)
 
     isMC = True
     if sample['nEvts'] < 0 : isMC = False

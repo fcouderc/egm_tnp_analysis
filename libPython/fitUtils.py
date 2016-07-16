@@ -148,7 +148,7 @@ def histFitterAltSig( info, tnpBin, tnpWorkspaceParam ):
 
     
     ## generated Z LineShape
-    fileTruth = rt.TFile('libCpp/ZeeGenLevel.root','read')
+    fileTruth = rt.TFile('etc/inputs/ZeeGenLevel.root','read')
     histZLineShape = fileTruth.Get('Mass')
     fitter.setZLineShapes(histZLineShape,histZLineShape)
     fileTruth.Close()
