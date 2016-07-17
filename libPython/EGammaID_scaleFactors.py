@@ -130,10 +130,6 @@ def EffiGraph1D(effDataList, sfList ,etaPlot,nameout):
         grBinsEffData = effUtil.makeTGraphFromList(effDataList[key], 'min', 'max')
         grBinsSF      = effUtil.makeTGraphFromList(sfList[key]     , 'min', 'max')
 
-        if not etaPlot:
-            print key
-            grBinsEffData.Print()
-
         grBinsSF     .SetMarkerColor( graphColors[igr] )
         grBinsSF     .SetLineColor(   graphColors[igr] )
         grBinsSF     .SetLineWidth(2)
@@ -287,11 +283,10 @@ for line in fileWithEff :
         etaKey = ( float(numbers[0]), float(numbers[1]) )
         ptKey  = ( float(numbers[2]), min(200,float(numbers[3])) )
         
-        print numbers
         myeff = efficiency(ptKey,etaKey,
                            float(numbers[4]),float(numbers[5]),float(numbers[6] ),float(numbers[7] ),
-#                           float(numbers[8]),float(numbers[9]),float(numbers[10]),float(numbers[11]) )
-                           float(numbers[8]),float(numbers[9]),float(numbers[10]), -1 )
+                           float(numbers[8]),float(numbers[9]),float(numbers[10]),float(numbers[11]) )
+#                           float(numbers[8]),float(numbers[9]),float(numbers[10]), -1 )
 
         effGraph.addEfficiency(myeff)
 
