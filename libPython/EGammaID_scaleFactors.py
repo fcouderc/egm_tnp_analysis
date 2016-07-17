@@ -12,7 +12,7 @@ import efficiencyUtils as effUtil
 tdrstyle.setTDRStyle()
 
 
-CMS_lumi.lumi_13TeV = "2.6 fb^{-1}"
+CMS_lumi.lumi_13TeV = "5.5 fb^{-1}"
 CMS_lumi.writeExtraText = 1
 CMS_lumi.lumi_sqrtS = "13 TeV"
 
@@ -290,8 +290,8 @@ for line in fileWithEff :
         print numbers
         myeff = efficiency(ptKey,etaKey,
                            float(numbers[4]),float(numbers[5]),float(numbers[6] ),float(numbers[7] ),
-#                           float(numbers[8]),float(numbers[9]),float(numbers[10]),float(numbers[11]) )
-                           float(numbers[8]),float(numbers[9]),float(numbers[10]), -1 )
+                           float(numbers[8]),float(numbers[9]),float(numbers[10]),float(numbers[11]) )
+#                           float(numbers[8]),float(numbers[9]),float(numbers[10]), -1 )
 
         effGraph.addEfficiency(myeff)
 
