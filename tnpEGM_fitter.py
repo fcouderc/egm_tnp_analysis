@@ -217,8 +217,8 @@ if args.sumUp:
             float(v2Range[0]), float(v2Range[2]),
             effis['dataNominal'][0],effis['dataNominal'][1],
             effis['mcNominal'  ][0],effis['mcNominal'  ][1],
-            effis['dataAltSig' ][0],
             effis['dataAltBkg' ][0],
+            effis['dataAltSig' ][0],
             effis['mcAlt' ][0],
             effis['tagSel'][0],
             )
