@@ -18,8 +18,9 @@ parser.add_argument('--mcSig'      , action='store_true'  , help = 'fit MC nom [
 parser.add_argument('--doPlot'     , action='store_true'  , help = 'plotting')
 parser.add_argument('--sumUp'      , action='store_true'  , help = 'sum up efficiencies')
 parser.add_argument('--iBin'       , dest = 'binNumber'   , type = int,  default=-1, help='bin number (to refit individual bin)')
-parser.add_argument('--flag'       , default = None       , help ='default is None')
+parser.add_argument('--flag'       , default = None       , help ='WP to test')
 parser.add_argument('settings'     , default = None       , help = 'setting file [mandatory]')
+
 
 args = parser.parse_args()
 
@@ -28,28 +29,40 @@ importSetting = 'import %s as tnpConf' % args.settings.replace('/','.').split('.
 print importSetting
 exec(importSetting)
 
+### tnp library
+import libPython.binUtils  as tnpBiner
+import libPython.rootUtils as tnpRoot
+
+
+sample = tnpConf.samplesDef['data']
+if sample is None:
+    print '[tnpEGM_fitter, prelim checks]: sample (data or MC) not available... check your settings'
+    sys.exit(1)
+sampleMC = tnpConf.samplesDef['mcNom']
+if sampleMC is None:
+    print '[tnpEGM_fitter, prelim checks]: MC sample not available... check your settings'
+    sys.exit(1)
+
 if args.flag is None:
-    print 'flag is MANDATORY, this is the working point as defined in the settings.py'
+    print '[tnpEGM_fitter] flag is MANDATORY, this is the working point as defined in the settings.py'
     sys.exit(0)
     
 if not args.flag in tnpConf.flags.keys() :
-    print 'flag %s not found in flags definitions' % args.flag
+    print '[tnpEGM_fitter] flag %s not found in flags definitions' % args.flag
     print '  --> define in settings first'
     print '  In settings I found flags: '
-    print tnpConf.flags
-    sys.exit(0)
+    print tnpConf.flags.keys()
+    sys.exit(1)
 
 outputDirectory = '%s/%s/' % (tnpConf.baseOutDir,args.flag)
 
 print '===>  Output directory: '
 print outputDirectory
 
-### tnp library
-import libPython.binUtils  as tnpBiner
-import libPython.rootUtils as tnpRoot
 
-
-#### Creating and/or loading the bining 
+####################################################################
+##### Create (check) Bins
+####################################################################
 if args.checkBins:
     tnpBins = tnpBiner.createBins(tnpConf.biningDef,tnpConf.cutBase)
     tnpBiner.tuneCuts( tnpBins, tnpConf.additionalCuts )
@@ -71,6 +84,7 @@ if args.createBins:
     sys.exit(0)
 
 tnpBins = pickle.load( open( '%s/bining.pkl'%(outputDirectory),'rb') )
+
 
 ####################################################################
 ##### Create Histograms
@@ -97,22 +111,15 @@ if args.createHists:
     sys.exit(0)
 
 
-sample = tnpConf.samplesDef['data']
-if args.mcSig :
-    sample = tnpConf.samplesDef['mcNom']
-if sample is None:
-    print '[FITTER]: sample (data or MC) not available... check histograming step'
-    sys.exit(1)
-sampleMC = tnpConf.samplesDef['mcNom']
-if sampleMC is None:
-    print '[FITTER]: MC sample not available... check histograming step'
-    sys.exit(1)
-
 
 
 ####################################################################
 ##### Actual Fitter
 ####################################################################
+### change the sample to fit is mc fit
+if args.mcSig :
+    sample = tnpConf.samplesDef['mcNom']
+
 if  args.doFit:
 
     isMC = True
