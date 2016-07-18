@@ -50,6 +50,7 @@ class efficiency:
         systAltSig      = self.altEff[self.iAltSigModel] - averageEffData
         systAltMC       = self.altEff[self.iAltMCSignal] - averageEffMC
         systAltTagSelec = self.altEff[self.iAltTagSelec] - averageEffData
+        systAltTagSelec = self.altEff[self.iAltTagSelec] - averageEffMC
 
         if self.altEff[self.iAltBkgModel] < 0:
             systAltBkg = 0
