@@ -34,15 +34,6 @@ import libPython.binUtils  as tnpBiner
 import libPython.rootUtils as tnpRoot
 
 
-sample = tnpConf.samplesDef['data']
-if sample is None:
-    print '[tnpEGM_fitter, prelim checks]: sample (data or MC) not available... check your settings'
-    sys.exit(1)
-sampleMC = tnpConf.samplesDef['mcNom']
-if sampleMC is None:
-    print '[tnpEGM_fitter, prelim checks]: MC sample not available... check your settings'
-    sys.exit(1)
-
 if args.flag is None:
     print '[tnpEGM_fitter] flag is MANDATORY, this is the working point as defined in the settings.py'
     sys.exit(0)
@@ -89,69 +80,62 @@ tnpBins = pickle.load( open( '%s/bining.pkl'%(outputDirectory),'rb') )
 ####################################################################
 ##### Create Histograms
 ####################################################################
+for s in tnpConf.samplesDef.keys():
+    sample =  tnpConf.samplesDef[s]
+    if sample is None: continue
+    setattr( sample, 'tree'     ,'%s/fitter_tree' % tnpConf.tnpTreeDir )
+    setattr( sample, 'histFile' , '%s/%s_%s.root' % ( outputDirectory , sample.name, args.flag ) )
+
+
 if args.createHists:
     for sampleType in tnpConf.samplesDef.keys():
         sample =  tnpConf.samplesDef[sampleType]
         if sample is None : continue
-        print 'creating histogram for sample %s' % sample['name']
-        isMC = True
-        if sample['nEvts'] < 0 : isMC = False
-        info = {
-            'infile'  : sample['path'],
-            'outfile' : '%s/%s_%s.root' % ( outputDirectory ,sample['name'], args.flag ),
-            'tree'    : '%s/fitter_tree'% tnpConf.tnpTreeDir,
-            'weight'  : tnpConf.weightName,
-            'flag'    : tnpConf.flags[args.flag],
-            'cut'     : sample['cut'],
-            'mcTruth' : sample['mcTruth'],
-            'isMC'    : isMC
-        }
+        print 'creating histogram for sample '
+        sample.dump()
+
         var = { 'name' : 'pair_mass', 'nbins' : 60, 'min' : 60, 'max': 120 }
-        tnpRoot.makePassFailHistograms( info, tnpBins, var )
+        tnpRoot.makePassFailHistograms( sample, tnpConf.flags[args.flag], tnpBins, var )
     sys.exit(0)
-
-
 
 
 ####################################################################
 ##### Actual Fitter
 ####################################################################
+sampleToFit = tnpConf.samplesDef['data']
+if sampleToFit is None:
+    print '[tnpEGM_fitter, prelim checks]: sample (data or MC) not available... check your settings'
+    sys.exit(1)
+
+sampleMC = tnpConf.samplesDef['mcNom']
+
+if sampleMC is None:
+    print '[tnpEGM_fitter, prelim checks]: MC sample not available... check your settings'
+    sys.exit(1)
+for s in tnpConf.samplesDef.keys():
+    sample =  tnpConf.samplesDef[s]
+    if sample is None: continue
+    setattr( sample, 'mcRef'     , sampleMC )
+    setattr( sample, 'nominalFit', '%s/%s_%s.nominalFit.root' % ( outputDirectory , sample.name, args.flag ) )
+    setattr( sample, 'altSigFit' , '%s/%s_%s.altSigFit.root'  % ( outputDirectory , sample.name, args.flag ) )
+    setattr( sample, 'altBkgFit' , '%s/%s_%s.altBkgFit.root'  % ( outputDirectory , sample.name, args.flag ) )
+
+
+
 ### change the sample to fit is mc fit
 if args.mcSig :
-    sample = tnpConf.samplesDef['mcNom']
+    sampleToFit = tnpConf.samplesDef['mcNom']
 
 if  args.doFit:
-
-    isMC = True
-    if sample['nEvts'] < 0 :
-        isMC = False
-        
-    info = {
-        'infile'  : '%s/%s_%s.root' % ( outputDirectory ,  sample['name'], args.flag ),
-        'tree'    : '%s/fitter_tree'% tnpConf.tnpTreeDir,
-        'mcTruth' : sample['mcTruth'],
-        'isMC'    : isMC,
-        'mcRef'   : None
-        }
-
-    info['mcRef'] = '%s/%s_%s.root' % ( outputDirectory ,  sampleMC['name'], args.flag )
-        
-    if args.binNumber == -1:
-        for ib in range(len(tnpBins['bins'])):
+    sampleToFit.dump()
+    for ib in range(len(tnpBins['bins'])):
+        if (args.binNumber >= 0 and ib == args.binNumber) or args.binNumber < 0:
             if args.altSig:                 
-                tnpRoot.histFitterAltSig(  info, tnpBins['bins'][ib], tnpConf.tnpParAltSigFit )
+                tnpRoot.histFitterAltSig(  sampleToFit, tnpBins['bins'][ib], tnpConf.tnpParAltSigFit )
             elif args.altBkg:
-                tnpRoot.histFitterAltBkg(  info, tnpBins['bins'][ib], tnpConf.tnpParAltBkgFit )
+                tnpRoot.histFitterAltBkg(  sampleToFit, tnpBins['bins'][ib], tnpConf.tnpParAltBkgFit )
             else:
-                tnpRoot.histFitterNominal( info, tnpBins['bins'][ib], tnpConf.tnpParNomFit )
-    else:
-        ib = args.binNumber
-        if args.altSig:                
-            tnpRoot.histFitterAltSig(  info, tnpBins['bins'][ib], tnpConf.tnpParAltSigFit )
-        elif args.altBkg:
-            tnpRoot.histFitterAltBkg(  info, tnpBins['bins'][ib], tnpConf.tnpParAltBkgFit )
-        else:
-            tnpRoot.histFitterNominal( info, tnpBins['bins'][ib], tnpConf.tnpParNomFit )
+                tnpRoot.histFitterNominal( sampleToFit, tnpBins['bins'][ib], tnpConf.tnpParNomFit )
 
     args.doPlot = True
      
@@ -159,32 +143,26 @@ if  args.doFit:
 ##### dumping plots
 ####################################################################
 if  args.doPlot:
-    fitType = 'nominalFit'
-    if args.altSig : fitType = 'altSigFit'
-    if args.altBkg : fitType = 'altBkgFit'
+    fileName = sampleToFit.nominalFit
+    fitType  = 'nominalFit'
+    if args.altSig : 
+        fileName = sampleToFit.altSigFit
+        fitType  = 'altSigFit'
+    if args.altBkg : 
+        fileName = sampleToFit.altBkgFit
+        fitType  = 'altBkgFit'
         
-    plottingDir = '%s/plots/%s/%s' % (outputDirectory,sample['name'],fitType)
+    plottingDir = '%s/plots/%s/%s' % (outputDirectory,sampleToFit.name,fitType)
     if not os.path.exists( plottingDir ):
         os.makedirs( plottingDir )
     shutil.copy('etc/inputs/index.php.listPlots','%s/index.php' % plottingDir)
 
-    isMC = True
-    if sample['nEvts'] < 0 : isMC = False
-    info = {
-        'outfile' : '%s/%s_%s.%s.root' % ( outputDirectory,sample['name'], args.flag, fitType ),
-        'mcTruth' : sample['mcTruth'],
-        'isMC'    : isMC,
-        'plotDir' : plottingDir
-    }        
-    
-    if args.binNumber == -1:
-        for ib in range(len(tnpBins['bins'])):
-            tnpRoot.histPlotter( info, tnpBins['bins'][ib] )
-    else:
-        tnpRoot.histPlotter( info, tnpBins['bins'][args.binNumber] )
+    for ib in range(len(tnpBins['bins'])):
+        if (args.binNumber >= 0 and ib == args.binNumber) or args.binNumber < 0:
+            tnpRoot.histPlotter( fileName, tnpBins['bins'][ib], plottingDir )
 
     print ' ===> Plots saved in <======='
-    print 'localhost/%s/' % plottingDir
+#    print 'localhost/%s/' % plottingDir
 
 
 ####################################################################
@@ -192,18 +170,18 @@ if  args.doPlot:
 ####################################################################
 if args.sumUp:
     info = {
-        'dataNominal' : '%s/%s_%s.%s.root' % ( outputDirectory , tnpConf.samplesDef['data' ]['name'], args.flag, 'nominalFit' ),
-        'dataAltSig'  : '%s/%s_%s.%s.root' % ( outputDirectory , tnpConf.samplesDef['data' ]['name'], args.flag, 'altSigFit'  ),
-        'dataAltBkg'  : '%s/%s_%s.%s.root' % ( outputDirectory , tnpConf.samplesDef['data' ]['name'], args.flag, 'altBkgFit'  ),
-        'mcNominal'   : '%s/%s_%s.root'    % ( outputDirectory , tnpConf.samplesDef['mcNom']['name'], args.flag ),
+        'dataNominal' : sampleToFit.nominalFit,
+        'dataAltSig'  : sampleToFit.altSigFit ,
+        'dataAltBkg'  : sampleToFit.altBkgFit ,
+        'mcNominal'   : sampleToFit.mcRef.histFile,
         'mcAlt'       : None,
         'tagSel'      : None
         }
 
     if not tnpConf.samplesDef['mcAlt' ] is None:
-        info['mcAlt'    ] = '%s/%s_%s.root'  % ( outputDirectory , tnpConf.samplesDef['mcAlt' ]['name'] , args.flag )
+        info['mcAlt'    ] = tnpConf.samplesDef['mcAlt' ].histFile
     if not tnpConf.samplesDef['tagSel'] is None:
-        info['tagSel'   ] = '%s/%s_%s.root'  % ( outputDirectory , tnpConf.samplesDef['tagSel']['name'] , args.flag )
+        info['tagSel'   ] = tnpConf.samplesDef['tagSel'].histFile
 
     effis = None
     effFileName ='%s/egammaEffi.txt' % outputDirectory 
@@ -216,10 +194,14 @@ if args.sumUp:
         v1Range = tnpBins['bins'][ib]['title'].split(';')[1].split('<')
         v2Range = tnpBins['bins'][ib]['title'].split(';')[2].split('<')
         if ib == 0 :
-            fOut.write( '### var1 : %s\n' % v1Range[1])
-            fOut.write( '### var2 : %s\n' % v2Range[1] )
+            astr = '### var1 : %s' % v1Range[1]
+            print astr
+            fOut.write( astr + '\n' )
+            astr = '### var2 : %s' % v2Range[1]
+            print astr
+            fOut.write( astr + '\n' )
             
-        fOut.write( '%1.3f\t%1.3f\t%1.3f\t%1.3f\t%1.3f\t%1.3f\t%1.3f\t%1.3f\t%1.3f\t%1.3f\t%1.3f\t%1.3f\n' % (
+        astr =  '%+8.3f\t%+8.3f\t%+8.3f\t%+8.3f\t%5.3f\t%5.3f\t%5.3f\t%5.3f\t%5.3f\t%5.3f\t%5.3f\t%5.3f' % (
             float(v1Range[0]), float(v1Range[2]),
             float(v2Range[0]), float(v2Range[2]),
             effis['dataNominal'][0],effis['dataNominal'][1],
@@ -229,7 +211,10 @@ if args.sumUp:
             effis['mcAlt' ][0],
             effis['tagSel'][0],
             )
-            )
+        print astr
+        fOut.write( astr + '\n' )
     fOut.close()
 
     print 'Effis saved in file : ',  effFileName
+    import libPython.EGammaID_scaleFactors as egm_sf
+    egm_sf.doEGM_SFs(effFileName)

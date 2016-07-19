@@ -8,7 +8,7 @@ from ROOT import tnpFitter
 
 import re
 
-def createWorkspaceForAltSig( info,  tnpBin, tnpWorkspaceParam ):
+def createWorkspaceForAltSig( sample, tnpBin, tnpWorkspaceParam ):
 
     ### tricky: use n < 0 for high pT bin (so need to remove param and add it back)
     cbNList = ['nP','nF']
@@ -39,14 +39,14 @@ def createWorkspaceForAltSig( info,  tnpBin, tnpWorkspaceParam ):
         ]
 
     tnpWorkspace = []
-    if not info['mcRef'] or info['mcTruth']:
+    if sample.mcTruth:
         tnpWorkspace.extend(tnpWorkspaceParam)
         tnpWorkspace.extend(tnpWorkspaceFunc)        
         return tnpWorkspace
 
     
-    fileref = info['mcRef'].replace('.root','.altSigFit.root')
-    filemc = rt.TFile(fileref,'read')
+    fileref = sample.mcRef.altSigFit
+    filemc  = rt.TFile(fileref,'read')
 
     from ROOT import RooFit,RooFitResult
     fitresP = filemc.Get( '%s_resP' % tnpBin['name']  )
@@ -93,7 +93,7 @@ def createWorkspaceForAltSig( info,  tnpBin, tnpWorkspaceParam ):
 #############################################################
 ########## nominal fitter
 #############################################################
-def histFitterNominal( info, tnpBin, tnpWorkspaceParam ):
+def histFitterNominal( sample, tnpBin, tnpWorkspaceParam ):
         
     tnpWorkspaceFunc = [
         "Gaussian::sigResPass(x,meanP,sigmaP)",
@@ -108,15 +108,15 @@ def histFitterNominal( info, tnpBin, tnpWorkspaceParam ):
 
     
     ## init fitter
-    infile = rt.TFile(info['infile'],"read")
+    infile = rt.TFile( sample.histFile, "read")
     fitter = tnpFitter( infile, tnpBin['name']  )
     fitter.useMinos()
     infile.Close()
-    rootfile = rt.TFile(info['infile'].replace('.root','.nominalFit.root'),'update')
+    rootfile = rt.TFile(sample.nominalFit,'update')
     fitter.setOutputFile( rootfile )
     
     ## generated Z LineShape
-    fileTruth = rt.TFile(info['mcRef'],'read')
+    fileTruth  = rt.TFile(sample.mcRef.histFile,'read')
     histZLineShapeP = fileTruth.Get('%s_Pass'%tnpBin['name'])
     histZLineShapeF = fileTruth.Get('%s_Fail'%tnpBin['name'])
     fitter.setZLineShapes(histZLineShapeP,histZLineShapeF)
@@ -131,7 +131,7 @@ def histFitterNominal( info, tnpBin, tnpWorkspaceParam ):
     title = tnpBin['title'].replace(';',' - ')
     title = title.replace('probe_sc_eta','#eta_{SC}')
     title = title.replace('probe_Ele_pt','p_{T}')
-    fitter.fits(info['mcTruth'],title)
+    fitter.fits(sample.mcTruth,title)
     rootfile.Close()
 
 
@@ -139,15 +139,15 @@ def histFitterNominal( info, tnpBin, tnpWorkspaceParam ):
 #############################################################
 ########## alternate signal fitter
 #############################################################
-def histFitterAltSig( info, tnpBin, tnpWorkspaceParam ):
+def histFitterAltSig( sample, tnpBin, tnpWorkspaceParam ):
 
-    tnpWorkspace = createWorkspaceForAltSig( info,  tnpBin, tnpWorkspaceParam )
+    tnpWorkspace = createWorkspaceForAltSig( sample,  tnpBin, tnpWorkspaceParam )
     
     ## init fitter
-    infile = rt.TFile(info['infile'],'read')
+    infile = rt.TFile(sample.histFile,'read')
     fitter = tnpFitter(infile, tnpBin['name']  )
     infile.Close()
-    rootfile = rt.TFile(info['infile'].replace('.root','.altSigFit.root'),'update')
+    rootfile = rt.TFile(sample.altSigFit,'update')
     fitter.setOutputFile( rootfile )
 
     
@@ -166,7 +166,7 @@ def histFitterAltSig( info, tnpBin, tnpWorkspaceParam ):
     title = tnpBin['title'].replace(';',' - ')
     title = title.replace('probe_sc_eta','#eta_{SC}')
     title = title.replace('probe_Ele_pt','p_{T}')
-    fitter.fits(info['mcTruth'],title)
+    fitter.fits(sample.mcTruth,title)
 
     rootfile.Close()
 
@@ -175,7 +175,7 @@ def histFitterAltSig( info, tnpBin, tnpWorkspaceParam ):
 #############################################################
 ########## alternate background fitter
 #############################################################
-def histFitterAltBkg( info, tnpBin, tnpWorkspaceParam ):
+def histFitterAltBkg( sample, tnpBin, tnpWorkspaceParam ):
 
     tnpWorkspaceFunc = [
         "Gaussian::sigResPass(x,meanP,sigmaP)",
@@ -190,14 +190,14 @@ def histFitterAltBkg( info, tnpBin, tnpWorkspaceParam ):
 
     
     ## init fitter
-    infile = rt.TFile(info['infile'],"read")
+    infile = rt.TFile(sample.histFile,"read")
     fitter = tnpFitter( infile, tnpBin['name']  )
     infile.Close()
-    rootfile = rt.TFile(info['infile'].replace('.root','.altBkgFit.root'),'update')
+    rootfile = rt.TFile(sample.altBkgFit,'update')
     fitter.setOutputFile( rootfile )
     
     ## generated Z LineShape
-    fileTruth = rt.TFile(info['mcRef'],'read')
+    fileTruth = rt.TFile(sample.mcRef.histFile,'read')
     histZLineShapeP = fileTruth.Get('%s_Pass'%tnpBin['name'])
     histZLineShapeF = fileTruth.Get('%s_Fail'%tnpBin['name'])
     fitter.setZLineShapes(histZLineShapeP,histZLineShapeF)
@@ -212,7 +212,7 @@ def histFitterAltBkg( info, tnpBin, tnpWorkspaceParam ):
     title = tnpBin['title'].replace(';',' - ')
     title = title.replace('probe_sc_eta','#eta_{SC}')
     title = title.replace('probe_Ele_pt','p_{T}')
-    fitter.fits(info['mcTruth'],title)
+    fitter.fits(sample.mcTruth,title)
     rootfile.Close()
 
 
