@@ -216,9 +216,9 @@ class efficiencyList:
                                 print str(self.effList[ptBin][etaBinPlus ])
                                 print str(self.effList[ptBin][etaBinMinus])
                                 print "   eff[+] = ",  self.effList[ptBin][etaBinPlus ].altEff[isyst]
-                                print "   eff[-] = ",  self.effList[ptBin][etaBinMinus].altEff[isyst]
-                                
-
+                                print "   eff[-] = ",  self.effList[ptBin][etaBinMinus].altEff[isyst]                                
+                                self.effList[ptBin][etaBinPlus ].altEff[isyst] = averageSyst
+                                self.effList[ptBin][etaBinMinus].altEff[isyst] = averageSyst
 
 
     def ptEtaScaleFactor_2DHisto(self, onlyError, relError = False):
