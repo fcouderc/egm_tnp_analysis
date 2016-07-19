@@ -1,5 +1,3 @@
-period = 'runB'
-
 #############################################################
 ########## General settings
 #############################################################
@@ -16,7 +14,7 @@ flags = {
     'passingMVA80'  : cutpass80,
     'passingMVA90'  : cutpass90,
     }
-baseOutDir = 'resultsEleID/%s/' % period
+baseOutDir = 'results/test/'
 
 #############################################################
 ########## samples definition  - preparing the samples
@@ -27,12 +25,11 @@ import etc.inputs.tnpSampleDef as tnpSamples
 tnpTreeDir = 'GsfElectronToEleID'
 
 samplesDef = {
-    'data'   : tnpSamples.ICHEP2016['data_2016_%s_ele' % period].clone(),
+    'data'   : tnpSamples.ICHEP2016['data_2016_runC_ele'].clone(),
     'mcNom'  : tnpSamples.ICHEP2016['mc_DY_madgraph_ele'].clone(),
     'mcAlt'  : tnpSamples.ICHEP2016['mc_DY_amcatnlo_ele'].clone(),
     'tagSel' : tnpSamples.ICHEP2016['mc_DY_madgraph_ele'].clone(),
 }
-
 ## can add data sample easily
 #samplesDef['data'  ].addSample( tnpSamples.ICHEP2016['data_2016_runC_ele'] )
 #samplesDef['data'  ].addSample( tnpSamples.ICHEP2016['data_2016_runD_ele'] )
@@ -42,33 +39,34 @@ samplesDef = {
 ## all the samples MUST have different names (i.e. sample.name must be different for all)
 ## if you need to use 2 times the same sample, then rename the second one
 #samplesDef['data'  ].set_cut('run >= 273726')
-samplesDef['mcNom' ].set_mcTruth()
-samplesDef['mcAlt' ].set_mcTruth()
-samplesDef['tagSel'].set_mcTruth()
-samplesDef['tagSel'].rename('mcAltSel_DY_madgraph_ele')
-samplesDef['tagSel'].set_cut('tag_Ele_pt > 33  && tag_Ele_nonTrigMVA > 0.90')
+if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_mcTruth()
+if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_mcTruth()
+if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_mcTruth()
+if not samplesDef['tagSel'] is None:
+    samplesDef['tagSel'].rename('mcAltSel_DY_madgraph_ele')
+    samplesDef['tagSel'].set_cut('tag_Ele_pt > 33  && tag_Ele_nonTrigMVA > 0.90')
 
 ## set MC weight, simple way (use tree weight) 
 #weightName = 'totWeight'
-#samplesDef['mcNom' ].set_weight(weightName)
-#samplesDef['mcAlt' ].set_weight(weightName)
-#samplesDef['tagSel'].set_weight(weightName)
+#if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_weight(weightName)
+#if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_weight(weightName)
+#if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_weight(weightName)
 
 ## set MC weight, can use several pileup rw for different data taking periods
-weightName = 'weights_2016_%s.totWeight' % period
-samplesDef['mcNom' ].set_weight(weightName)
-samplesDef['mcAlt' ].set_weight(weightName)
-samplesDef['tagSel'].set_weight(weightName)
-samplesDef['mcNom' ].set_puTree('etc/inputs/ichep2016/mc_DY_madgraph_ele.puTree.root')
-samplesDef['mcAlt' ].set_puTree('etc/inputs/ichep2016/mc_DY_amcatnlo_ele.puTree.root')
-samplesDef['tagSel'].set_puTree('etc/inputs/ichep2016/mc_DY_madgraph_ele.puTree.root')
+weightName = 'weights_2016_runC.totWeight'
+if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_weight(weightName)
+if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_weight(weightName)
+if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_weight(weightName)
+if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_puTree('etc/inputs/ichep2016/mc_DY_madgraph_ele.puTree.root')
+if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_puTree('etc/inputs/ichep2016/mc_DY_amcatnlo_ele.puTree.root')
+if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_puTree('etc/inputs/ichep2016/mc_DY_madgraph_ele.puTree.root')
 
 
 #############################################################
 ########## bining definition  [can be nD bining]
 #############################################################
 biningDef = [
-   { 'var' : 'probe_sc_eta' , 'type': 'float', 'bins': [-2.5,-2.0,-1.566,-1.442, -0.8, 0.0, 0.8, 1.442, 1.566, 2.0, 2.5] },
+   { 'var' : 'probe_sc_eta' , 'type': 'float', 'bins': [-2.5,-2.0,-1.566,-1.4442, -0.8, 0.0, 0.8, 1.4442, 1.566, 2.0, 2.5] },
    { 'var' : 'probe_Ele_pt' , 'type': 'float', 'bins': [10,20.0,30,40,50,200] },
 ]
 
