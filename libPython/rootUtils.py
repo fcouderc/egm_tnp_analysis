@@ -9,13 +9,19 @@ def removeNegativeBins(h):
             h.SetBinContent(i, 0)
 
 
-def makePassFailHistograms( info, bindef, var ):
+def makePassFailHistograms( sample, flag, bindef, var ):
     ## open rootfile
-    tree = rt.TChain(info['tree'])
-    tree.Add(info['infile'])
+    tree = rt.TChain(sample.tree)
+    for p in sample.path:
+        print ' adding rootfile: ', p
+        tree.Add(p)
     
+    if not sample.puTree is None:
+        print ' - Adding weight tree: %s from file %s ' % (sample.weight.split('.')[0], sample.puTree)
+        tree.AddFriend(sample.weight.split('.')[0],sample.puTree)
+
     ## open outputFile
-    outfile = rt.TFile(info['outfile'],'recreate')
+    outfile = rt.TFile(sample.histFile,'recreate')
     hPass = []
     hFail = []
     for ib in range(len(bindef['bins'])):
@@ -26,17 +32,17 @@ def makePassFailHistograms( info, bindef, var ):
         hFail[ib].Sumw2()
     
         cuts = bindef['bins'][ib]['cut']
-        if info['mcTruth'] :
+        if sample.mcTruth :
             cuts = '%s && mcTrue==1' % cuts
-        if not info['cut'] is None :
-            cuts = '%s && %s' % (cuts,info['cut'])
+        if not sample.cut is None :
+            cuts = '%s && %s' % (cuts,sample.cut)
                 
-        if info['isMC'] :
-            cutPass = '( %s &&  %s ) * %s ' % (cuts, info['flag'], info['weight'])
-            cutFail = '( %s && !%s ) * %s ' % (cuts, info['flag'], info['weight'])
+        if sample.isMC :
+            cutPass = '( %s &&  %s ) * %s ' % (cuts, flag, sample.weight)
+            cutFail = '( %s && !%s ) * %s ' % (cuts, flag, sample.weight)
         else:
-            cutPass = '( %s &&  %s )' % (cuts, info['flag'])
-            cutFail = '( %s && !%s )' % (cuts, info['flag'])
+            cutPass = '( %s &&  %s )' % (cuts, flag)
+            cutFail = '( %s && !%s )' % (cuts, flag)
         
         tree.Draw('%s >> %s' % (var['name'],hPass[ib].GetName()),cutPass,'goff')
         tree.Draw('%s >> %s' % (var['name'],hFail[ib].GetName()),cutFail,'goff')
@@ -60,12 +66,13 @@ def makePassFailHistograms( info, bindef, var ):
 
 
 
-def histPlotter( info, tnpBin ):
-    print 'opening ', info['outfile']
-    rootfile = rt.TFile(info['outfile'],"read")
+def histPlotter( filename, tnpBin, plotDir ):
+    print 'opening ', filename
+    print '  get canvas: ' , '%s_Canv' % tnpBin['name']
+    rootfile = rt.TFile(filename,"read")
 
     c = rootfile.Get( '%s_Canv' % tnpBin['name'] )
-    c.Print( '%s/%s.png' % (info['plotDir'],tnpBin['name']))
+    c.Print( '%s/%s.png' % (plotDir,tnpBin['name']))
 
 
 def computeEffi( n1,n2,e1,e2):

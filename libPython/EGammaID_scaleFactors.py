@@ -260,106 +260,111 @@ def diagnosticErrorPlot( effgr, ierror, nameout ):
     c2D_Err.Print(nameout)
 
 
-filein = sys.argv[1]
-print " Opening file: ", filein
 
-nameOutBase = filein 
-if not os.path.exists( filein ) :
-    print 'file %s does not exist' % filein
-    sys.exit(1)
+def doEGM_SFs(filein):
+    print " Opening file: ", filein
 
-
-fileWithEff = open(filein, 'r')
+    nameOutBase = filein 
+    if not os.path.exists( filein ) :
+        print 'file %s does not exist' % filein
+        sys.exit(1)
 
 
-effGraph = efficiencyList()
-
-for line in fileWithEff :
-    modifiedLine = line.lstrip(' ').rstrip(' ').rstrip('\n')
-    numbers = modifiedLine.split('\t')
+    fileWithEff = open(filein, 'r')
 
 
-    if len(numbers) > 0 and isFloat(numbers[0]):
-        etaKey = ( float(numbers[0]), float(numbers[1]) )
-        ptKey  = ( float(numbers[2]), min(200,float(numbers[3])) )
+    effGraph = efficiencyList()
+    
+    for line in fileWithEff :
+        modifiedLine = line.lstrip(' ').rstrip(' ').rstrip('\n')
+        numbers = modifiedLine.split('\t')
+
+        if len(numbers) > 0 and isFloat(numbers[0]):
+            etaKey = ( float(numbers[0]), float(numbers[1]) )
+            ptKey  = ( float(numbers[2]), min(200,float(numbers[3])) )
         
-        myeff = efficiency(ptKey,etaKey,
-                           float(numbers[4]),float(numbers[5]),float(numbers[6] ),float(numbers[7] ),
-                           float(numbers[8]),float(numbers[9]),float(numbers[10]),float(numbers[11]) )
+            myeff = efficiency(ptKey,etaKey,
+                               float(numbers[4]),float(numbers[5]),float(numbers[6] ),float(numbers[7] ),
+                               float(numbers[8]),float(numbers[9]),float(numbers[10]),float(numbers[11]) )
 #                           float(numbers[8]),float(numbers[9]),float(numbers[10]), -1 )
 
-        effGraph.addEfficiency(myeff)
+            effGraph.addEfficiency(myeff)
 
-fileWithEff.close()
+    fileWithEff.close()
 
 ### massage the numbers a bit
-effGraph.symmetrizeSystVsEta()
-effGraph.combineSyst()
+    effGraph.symmetrizeSystVsEta()
+    effGraph.combineSyst()
 
-print " ------------------------------- "
+    print " ------------------------------- "
 
-customEtaBining = []
-customEtaBining.append( (0.000,0.800))
-customEtaBining.append( (0.800,1.444))
-customEtaBining.append( (1.444,1.566))
-customEtaBining.append( (1.566,2.000))
-customEtaBining.append( (2.000,2.500))
-
-
-pdfout = nameOutBase + '_egammaPlots.pdf'
-cDummy = rt.TCanvas()
-cDummy.Print( pdfout + "[" )
+    customEtaBining = []
+    customEtaBining.append( (0.000,0.800))
+    customEtaBining.append( (0.800,1.444))
+    customEtaBining.append( (1.444,1.566))
+    customEtaBining.append( (1.566,2.000))
+    customEtaBining.append( (2.000,2.500))
 
 
-EffiGraph1D( effGraph.pt_1DGraph_list(False) , effGraph.pt_1DGraph_list(True) , False, pdfout )
+    pdfout = nameOutBase + '_egammaPlots.pdf'
+    cDummy = rt.TCanvas()
+    cDummy.Print( pdfout + "[" )
+
+
+    EffiGraph1D( effGraph.pt_1DGraph_list(False) , effGraph.pt_1DGraph_list(True) , False, pdfout )
 #EffiGraph1D( effGraph.pt_1DGraph_list_customEtaBining(customEtaBining,False) , 
 #             effGraph.pt_1DGraph_list_customEtaBining(customEtaBining,True)   , False, pdfout )
-EffiGraph1D( effGraph.eta_1DGraph_list(False), effGraph.eta_1DGraph_list(True), True , pdfout )
+    EffiGraph1D( effGraph.eta_1DGraph_list(False), effGraph.eta_1DGraph_list(True), True , pdfout )
 
 #cDummy.Print( pdfout + "]" )
 
-h2SF    = effGraph.ptEtaScaleFactor_2DHisto(-1)
-h2Error = effGraph.ptEtaScaleFactor_2DHisto( 0)  ## only error bars
+    h2SF    = effGraph.ptEtaScaleFactor_2DHisto(-1)
+    h2Error = effGraph.ptEtaScaleFactor_2DHisto( 0)  ## only error bars
 
-rt.gStyle.SetPalette(1)
-rt.gStyle.SetPaintTextFormat('1.3f');
-rt.gStyle.SetOptTitle(1)
+    rt.gStyle.SetPalette(1)
+    rt.gStyle.SetPaintTextFormat('1.3f');
+    rt.gStyle.SetOptTitle(1)
 
-c2D = rt.TCanvas('canScaleFactor','canScaleFactor',900,600)
-c2D.Divide(2,1)
-c2D.GetPad(1).SetRightMargin(0.15)
-c2D.GetPad(1).SetLeftMargin( 0.15)
-c2D.GetPad(1).SetTopMargin(  0.10)
-c2D.GetPad(2).SetRightMargin(0.15)
-c2D.GetPad(2).SetLeftMargin( 0.15)
-c2D.GetPad(2).SetTopMargin(  0.10)
-c2D.GetPad(1).SetLogy()
-c2D.GetPad(2).SetLogy()
+    c2D = rt.TCanvas('canScaleFactor','canScaleFactor',900,600)
+    c2D.Divide(2,1)
+    c2D.GetPad(1).SetRightMargin(0.15)
+    c2D.GetPad(1).SetLeftMargin( 0.15)
+    c2D.GetPad(1).SetTopMargin(  0.10)
+    c2D.GetPad(2).SetRightMargin(0.15)
+    c2D.GetPad(2).SetLeftMargin( 0.15)
+    c2D.GetPad(2).SetTopMargin(  0.10)
+    c2D.GetPad(1).SetLogy()
+    c2D.GetPad(2).SetLogy()
+    
+
+    c2D.cd(1)
+    dmin = 1.0 - h2SF.GetMinimum()
+    dmax = h2SF.GetMaximum() - 1.0
+    dall = max(dmin,dmax)
+    h2SF.SetMinimum(1-dall)
+    h2SF.SetMaximum(1+dall)
+    h2SF.DrawCopy("colz TEXT45")
+    
+    c2D.cd(2)
+    h2Error.SetMinimum(0)
+    h2Error.SetMaximum(min(h2Error.GetMaximum(),0.2))    
+    h2Error.DrawCopy("colz TEXT45")
+
+    c2D.Print( pdfout )
 
 
-c2D.cd(1)
-dmin = 1.0 - h2SF.GetMinimum()
-dmax = h2SF.GetMaximum() - 1.0
-dall = max(dmin,dmax)
-h2SF.SetMinimum(1-dall)
-h2SF.SetMaximum(1+dall)
-h2SF.DrawCopy("colz TEXT45")
+    rootout = rt.TFile(nameOutBase + '_SF2D.root','recreate')
+    rootout.cd()
+    h2SF.Write('EGamma_SF2D',rt.TObject.kOverwrite)
+    rootout.Close()
 
-c2D.cd(2)
-h2Error.SetMinimum(0)
-h2Error.SetMaximum(min(h2Error.GetMaximum(),0.2))
+    for isyst in range(len(efficiency.getSystematicNames())):
+        diagnosticErrorPlot( effGraph, isyst, pdfout )
 
-h2Error.DrawCopy("colz TEXT45")
-
-c2D.Print( pdfout )
+    cDummy.Print( pdfout + "]" )
 
 
-rootout = rt.TFile(nameOutBase + '_SF2D.root','recreate')
-rootout.cd()
-h2SF.Write('EGamma_SF2D',rt.TObject.kOverwrite)
-rootout.Close()
 
-for isyst in range(len(efficiency.getSystematicNames())):
-    diagnosticErrorPlot( effGraph, isyst, pdfout )
-
-cDummy.Print( pdfout + "]" )
+if __name__ == "__main__":
+    filein = sys.argv[1]
+    doEGM_SFs(filein)

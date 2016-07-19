@@ -2,8 +2,8 @@
 ########## General settings
 #############################################################
 # flag to be Tested
-cutpass80 = '(( abs(probe_sc_eta) < 0.8 && probe_Ele_nonTrigMVA > %f ) ||  ( abs(probe_sc_eta) > 0.8 && abs(probe_sc_eta) < 1.479&& probe_Ele_nonTrigMVA > %f ) || ( abs(probe_sc_eta) > 1.479 && probe_Ele_nonTrigMVA > %f ) )' % (0.988153,0.967910,0.841729)
-cutpass90 = '(( abs(probe_sc_eta) < 0.8 && probe_Ele_nonTrigMVA > %f ) ||  ( abs(probe_sc_eta) > 0.8 && abs(probe_sc_eta) < 1.479&& probe_Ele_nonTrigMVA > %f ) || ( abs(probe_sc_eta) > 1.479 && probe_Ele_nonTrigMVA > %f ) )' % (0.972153,0.922126,0.610764)
+cutpass80 = '(( abs(probe_sc_eta) < 0.8 && probe_Ele_nonTrigMVA > %f ) ||  ( abs(probe_sc_eta) > 0.8 && abs(probe_sc_eta) < 1.479&& probe_Ele_nonTrigMVA > %f ) || ( abs(probe_sc_eta) > 1.479 && probe_Ele_nonTrigMVA > %f ) )' % (0.967083,0.929117,0.726311)
+cutpass90 = '(( abs(probe_sc_eta) < 0.8 && probe_Ele_nonTrigMVA > %f ) ||  ( abs(probe_sc_eta) > 0.8 && abs(probe_sc_eta) < 1.479&& probe_Ele_nonTrigMVA > %f ) || ( abs(probe_sc_eta) > 1.479 && probe_Ele_nonTrigMVA > %f ) )' % (0.913286,0.805013,0.358969)
 
 # flag to be Tested
 flags = {
@@ -14,36 +14,59 @@ flags = {
     'passingMVA80'  : cutpass80,
     'passingMVA90'  : cutpass90,
     }
-baseOutDir = 'results/runB/'
+baseOutDir = 'results/test/'
 
 #############################################################
-########## samples definition  [can be nD bining]
+########## samples definition  - preparing the samples
 #############################################################
+### samples are defined in etc/inputs/tnpSampleDef.py
+### not: you can setup another sampleDef File in inputs
+import etc.inputs.tnpSampleDef as tnpSamples
 tnpTreeDir = 'GsfElectronToEleID'
-weightName = 'totWeight'
 
-### MANDATORY nEvts in data = -1 // mcTruth will require mc Matching
-## some sample based cuts... general cuts defined here after
-cutAltSel = 'tag_Ele_pt > 33  && tag_Ele_nonTrigMVA > 0.90'
-cutData   = 'run >= 273726' 
 samplesDef = {
-    'data'      : { 'name' :  'data_2016_runB_p2' , 'mcTruth' : False, 'nEvts':       -1, 'cut' : cutData,
-                    'path' : '../data/TnPTree_SingleElectron_2016_RunB.root'  },
-    'mcNom'     : { 'name' : 'mcMadgraph80XNom'   , 'mcTruth' : True , 'nEvts': 36311064, 'cut' : None,
-                    'path' : '../data/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root'  },
-    'mcAlt'     : None,
-    'tagSel'    : { 'name' : 'mcMadgraph80XAltSel', 'mcTruth' : True , 'nEvts': 36311064, 'cut': cutAltSel,
-                    'path' : '../data/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root'  },
+    'data'   : tnpSamples.ICHEP2016['data_2016_runC_ele'].clone(),
+    'mcNom'  : tnpSamples.ICHEP2016['mc_DY_madgraph_ele'].clone(),
+    'mcAlt'  : tnpSamples.ICHEP2016['mc_DY_amcatnlo_ele'].clone(),
+    'tagSel' : tnpSamples.ICHEP2016['mc_DY_madgraph_ele'].clone(),
 }
+## can add data sample easily
+#samplesDef['data'  ].addSample( tnpSamples.ICHEP2016['data_2016_runC_ele'] )
+#samplesDef['data'  ].addSample( tnpSamples.ICHEP2016['data_2016_runD_ele'] )
 
-### lumi in /fb
-lumi = 5.657
+## some sample-based cuts... general cuts defined here after
+## require mcTruth on MC DY samples and additional cuts
+## all the samples MUST have different names (i.e. sample.name must be different for all)
+## if you need to use 2 times the same sample, then rename the second one
+#samplesDef['data'  ].set_cut('run >= 273726')
+if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_mcTruth()
+if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_mcTruth()
+if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_mcTruth()
+if not samplesDef['tagSel'] is None:
+    samplesDef['tagSel'].rename('mcAltSel_DY_madgraph_ele')
+    samplesDef['tagSel'].set_cut('tag_Ele_pt > 33  && tag_Ele_nonTrigMVA > 0.90')
+
+## set MC weight, simple way (use tree weight) 
+#weightName = 'totWeight'
+#if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_weight(weightName)
+#if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_weight(weightName)
+#if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_weight(weightName)
+
+## set MC weight, can use several pileup rw for different data taking periods
+weightName = 'weights_2016_runC.totWeight'
+if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_weight(weightName)
+if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_weight(weightName)
+if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_weight(weightName)
+if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_puTree('etc/inputs/ichep2016/mc_DY_madgraph_ele.puTree.root')
+if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_puTree('etc/inputs/ichep2016/mc_DY_amcatnlo_ele.puTree.root')
+if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_puTree('etc/inputs/ichep2016/mc_DY_madgraph_ele.puTree.root')
+
 
 #############################################################
 ########## bining definition  [can be nD bining]
 #############################################################
 biningDef = [
-   { 'var' : 'probe_sc_eta' , 'type': 'float', 'bins': [-2.5,-2.0,-1.566,-1.442, -1.0, 0.0, 1.0, 1.442, 1.566, 2.0, 2.5] },
+   { 'var' : 'probe_sc_eta' , 'type': 'float', 'bins': [-2.5,-2.0,-1.566,-1.442, -0.8, 0.0, 0.8, 1.442, 1.566, 2.0, 2.5] },
    { 'var' : 'probe_Ele_pt' , 'type': 'float', 'bins': [10,20.0,30,40,50,200] },
 ]
 
