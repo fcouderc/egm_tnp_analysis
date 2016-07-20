@@ -47,20 +47,10 @@ if not samplesDef['tagSel'] is None:
     samplesDef['tagSel'].set_cut('tag_Ele_pt > 33  && tag_Ele_nonTrigMVA > 0.90')
 
 ## set MC weight, simple way (use tree weight) 
-#weightName = 'totWeight'
-#if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_weight(weightName)
-#if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_weight(weightName)
-#if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_weight(weightName)
-
-## set MC weight, can use several pileup rw for different data taking periods
-weightName = 'weights_2016_runC.totWeight'
+weightName = 'totWeight'
 if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_weight(weightName)
 if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_weight(weightName)
 if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_weight(weightName)
-if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_puTree('etc/inputs/ichep2016/mc_DY_madgraph_ele.puTree.root')
-if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_puTree('etc/inputs/ichep2016/mc_DY_amcatnlo_ele.puTree.root')
-if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_puTree('etc/inputs/ichep2016/mc_DY_madgraph_ele.puTree.root')
-
 
 #############################################################
 ########## bining definition  [can be nD bining]
