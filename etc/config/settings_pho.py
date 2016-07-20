@@ -2,17 +2,12 @@
 ########## General settings
 #############################################################
 # flag to be Tested
-cutpass80 = '(( abs(probe_sc_eta) < 0.8 && probe_Ele_nonTrigMVA > %f ) ||  ( abs(probe_sc_eta) > 0.8 && abs(probe_sc_eta) < 1.479&& probe_Ele_nonTrigMVA > %f ) || ( abs(probe_sc_eta) > 1.479 && probe_Ele_nonTrigMVA > %f ) )' % (0.967083,0.929117,0.726311)
-cutpass90 = '(( abs(probe_sc_eta) < 0.8 && probe_Ele_nonTrigMVA > %f ) ||  ( abs(probe_sc_eta) > 0.8 && abs(probe_sc_eta) < 1.479&& probe_Ele_nonTrigMVA > %f ) || ( abs(probe_sc_eta) > 1.479 && probe_Ele_nonTrigMVA > %f ) )' % (0.913286,0.805013,0.358969)
-
-# flag to be Tested
 flags = {
     'passingVeto'   : '(passingVeto   == 1)',
     'passingLoose'  : '(passingLoose  == 1)',
     'passingMedium' : '(passingMedium == 1)',
     'passingTight'  : '(passingTight  == 1)',
-    'passingMVA80'  : cutpass80,
-    'passingMVA90'  : cutpass90,
+    'passingMVA'    : '(passingMVA    == 1)',
     }
 baseOutDir = 'results/test/'
 
