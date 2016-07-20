@@ -261,8 +261,9 @@ def diagnosticErrorPlot( effgr, ierror, nameout ):
 
 
 
-def doEGM_SFs(filein):
-    print " Opening file: ", filein
+def doEGM_SFs(filein, lumi):
+    print " Opening file: %s (plot lumi: %3.1f)" % ( filein, lumi )
+    CMS_lumi.lumi_13TeV = "%+3.1f fb^{-1}" % args.lumi 
 
     nameOutBase = filein 
     if not os.path.exists( filein ) :
@@ -271,8 +272,6 @@ def doEGM_SFs(filein):
 
 
     fileWithEff = open(filein, 'r')
-
-
     effGraph = efficiencyList()
     
     for line in fileWithEff :
@@ -366,5 +365,16 @@ def doEGM_SFs(filein):
 
 
 if __name__ == "__main__":
-    filein = sys.argv[1]
-    doEGM_SFs(filein)
+
+    import argparse
+    parser = argparse.ArgumentParser(description='tnp EGM scale factors')
+    parser.add_argument('--lumi'  , type = float, default = -1, help = 'Lumi (just for plotting purpose)')
+    parser.add_argument('txtFile' , default = None, help = 'EGM formatted txt file')
+
+    args = parser.parse_args()
+
+    if args.txtFile is None:
+        print ' - Needs EGM txt file as input'
+        sys.exit(1)
+    
+    doEGM_SFs(args.txtFile, args.lumi)
