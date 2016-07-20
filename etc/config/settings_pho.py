@@ -22,7 +22,7 @@ baseOutDir = 'results/test/'
 ### samples are defined in etc/inputs/tnpSampleDef.py
 ### not: you can setup another sampleDef File in inputs
 import etc.inputs.tnpSampleDef as tnpSamples
-tnpTreeDir = 'GsfElectronToEleID'
+tnpTreeDir = 'GsfElectronToPhoID'
 
 samplesDef = {
     'data'   : tnpSamples.ICHEP2016['data_2016_runC_pho'].clone(),
