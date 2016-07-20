@@ -56,21 +56,31 @@ class tnpSample:
 
 
 import ROOT as rt
-class tnpVarHist:
-    def __init__(self, hname, var, title = None, xmin = -1, xmax = -1, nbins = -1 ):
+class tnpVar:
+    def __init__(self, var, hname = None, title = None, xmin = 0, xmax = 0, nbins = -1 ):
         self.var   = var
         if title is None :  self.title = var
-        else: self.title = title
+        else:               self.title = title
         self.xmin  = xmin
         self.xmax  = xmax
         self.nbins = nbins
         self.hname = hname
-        if nbins > 0:
-            self.hist  = rt.TH1F( hname, title, nbin, xmin, xmax )
-            self.hist.GetXaxis().SetTitle(title)
+        self.hist  = None
+
+    def get_hist(self):
+        if self.nbins > 0:
+            if self.hname is None:  self.hname  = 'h_%' % var
+            self.hist  = rt.TH1F( self.hname, self.title, 
+                                  self.nbins, self.xmin, self.xmax )
+            self.hist.GetXaxis().SetTitle(self.title)
+            self.hist.SetMinimum(0)
+
         else:
             self.hist = None
 
-    def hist(self):
         return self.hist
+
+    def set_hname(self,name):
+        self.hname = name
+
 
