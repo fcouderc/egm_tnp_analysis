@@ -263,7 +263,7 @@ def diagnosticErrorPlot( effgr, ierror, nameout ):
 
 def doEGM_SFs(filein, lumi):
     print " Opening file: %s (plot lumi: %3.1f)" % ( filein, lumi )
-    CMS_lumi.lumi_13TeV = "%+3.1f fb^{-1}" % args.lumi 
+    CMS_lumi.lumi_13TeV = "%+3.1f fb^{-1}" % lumi 
 
     nameOutBase = filein 
     if not os.path.exists( filein ) :
