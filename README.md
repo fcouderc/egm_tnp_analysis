@@ -36,7 +36,7 @@ Help message:
 The settings have always to be passed to the fitter
 >    python tnpEGM_fitter.py etc/config/settings.py 
 
-Therefore several "settings.py" files  can be setup to do different WPs for instance
+Therefore several "settings.py" files  can be setup (for different run period for instance)
 
 
 ## The different fitting steps
