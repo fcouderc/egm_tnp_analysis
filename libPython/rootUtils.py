@@ -1,7 +1,7 @@
 import ROOT as rt
 import math
-from fitUtils import *
-
+#from fitUtils import *
+from fitSimultaneousUtils import *
     
 def removeNegativeBins(h):
     for i in xrange(h.GetNbinsX()):
@@ -92,7 +92,6 @@ def getAllEffi( info, bindef ):
 
         nP = hP.Integral()
         nF = hF.Integral()
-
         eP = math.sqrt(hP.GetEntries())/hP.GetEntries() * nP
         eF = math.sqrt(hF.GetEntries())/hF.GetEntries() * nF
 
@@ -110,6 +109,8 @@ def getAllEffi( info, bindef ):
 
         eP = math.sqrt(hP.GetEntries())/hP.GetEntries() * nP
         eF = math.sqrt(hF.GetEntries())/hF.GetEntries() * nF
+        if eP < 0.001 : eP = 0.001
+        if eF < 0.001 : eF = 0.001
 
         effis['tagSel'] = computeEffi(nP,nF,eP,eF)
         rootfile.Close()
@@ -125,6 +126,8 @@ def getAllEffi( info, bindef ):
 
         eP = math.sqrt(hP.GetEntries())/hP.GetEntries() * nP
         eF = math.sqrt(hF.GetEntries())/hF.GetEntries() * nF
+        if eP < 0.001 : eP = 0.001
+        if eF < 0.001 : eF = 0.001
 
         effis['mcAlt'] = computeEffi(nP,nF,eP,eF)
         rootfile.Close()
@@ -142,6 +145,8 @@ def getAllEffi( info, bindef ):
         nF = fitF.getVal()
         eP = fitP.getError()
         eF = fitF.getError()
+        if eP < 0.001 : eP = 0.001
+        if eF < 0.001 : eF = 0.001
 
         effis['dataNominal'] = computeEffi(nP,nF,eP,eF)
         rootfile.Close()
@@ -157,6 +162,8 @@ def getAllEffi( info, bindef ):
         nF = fitresF.floatParsFinal().find('nSigF').getVal()
         eP = fitresP.floatParsFinal().find('nSigP').getError()
         eF = fitresF.floatParsFinal().find('nSigF').getError()
+        if eP < 0.001 : eP = 0.001
+        if eF < 0.001 : eF = 0.001
 
         effis['dataAltSig'] = computeEffi(nP,nF,eP,eF)
         rootfile.Close()
@@ -173,6 +180,8 @@ def getAllEffi( info, bindef ):
         nF = fitresF.floatParsFinal().find('nSigF').getVal()
         eP = fitresP.floatParsFinal().find('nSigP').getError()
         eF = fitresF.floatParsFinal().find('nSigF').getError()
+        if eP < 0.001 : eP = 0.001
+        if eF < 0.001 : eF = 0.001
 
         effis['dataAltBkg'] = computeEffi(nP,nF,eP,eF)
         rootfile.Close()
