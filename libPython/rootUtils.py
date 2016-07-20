@@ -1,7 +1,7 @@
 import ROOT as rt
 import math
-#from fitUtils import *
-from fitSimultaneousUtils import *
+from fitUtils import *
+#from fitSimultaneousUtils import *
     
 def removeNegativeBins(h):
     for i in xrange(h.GetNbinsX()):
