@@ -94,6 +94,8 @@ def getAllEffi( info, bindef ):
         nF = hF.Integral()
         eP = math.sqrt(hP.GetEntries())/hP.GetEntries() * nP
         eF = math.sqrt(hF.GetEntries())/hF.GetEntries() * nF
+        if eP < 0.001 : eP = 0.001
+        if eF < 0.001 : eF = 0.001
 
         effis['mcNominal'] = computeEffi(nP,nF,eP,eF)
         rootfile.Close()
