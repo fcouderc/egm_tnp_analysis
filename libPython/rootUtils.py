@@ -76,10 +76,15 @@ def histPlotter( filename, tnpBin, plotDir ):
 
 
 def computeEffi( n1,n2,e1,e2):
-    eff = []
-    eff.append(n1/(n1+n2))
-    eff.append(1/(n1+n2)*math.sqrt(e1*e1*n2*n2+e2*e2*n1*n1)/(n1+n2))
-    return eff
+    effout = []
+    eff   = n1/(n1+n2)
+    e_eff = 1/(n1+n2)*math.sqrt(e1*e1*n2*n2+e2*e2*n1*n1)/(n1+n2)
+    if e_eff < 0.001 : e_eff = 0.001
+
+    effout.append(eff)
+    effout.append(e_eff)
+    
+    return effout
 
 
 import os.path
@@ -94,8 +99,6 @@ def getAllEffi( info, bindef ):
         nF = hF.Integral()
         eP = math.sqrt(hP.GetEntries())/hP.GetEntries() * nP
         eF = math.sqrt(hF.GetEntries())/hF.GetEntries() * nF
-        if eP < 0.001 : eP = 0.001
-        if eF < 0.001 : eF = 0.001
 
         effis['mcNominal'] = computeEffi(nP,nF,eP,eF)
         rootfile.Close()
@@ -105,14 +108,11 @@ def getAllEffi( info, bindef ):
         rootfile = rt.TFile( info['tagSel'], 'read' )
         hP = rootfile.Get('%s_Pass'%bindef['name'])
         hF = rootfile.Get('%s_Fail'%bindef['name'])
-
         nP = hP.Integral()
         nF = hF.Integral()
 
         eP = math.sqrt(hP.GetEntries())/hP.GetEntries() * nP
         eF = math.sqrt(hF.GetEntries())/hF.GetEntries() * nF
-        if eP < 0.001 : eP = 0.001
-        if eF < 0.001 : eF = 0.001
 
         effis['tagSel'] = computeEffi(nP,nF,eP,eF)
         rootfile.Close()
@@ -122,14 +122,11 @@ def getAllEffi( info, bindef ):
         rootfile = rt.TFile( info['mcAlt'], 'read' )
         hP = rootfile.Get('%s_Pass'%bindef['name'])
         hF = rootfile.Get('%s_Fail'%bindef['name'])
-
         nP = hP.Integral()
         nF = hF.Integral()
 
         eP = math.sqrt(hP.GetEntries())/hP.GetEntries() * nP
         eF = math.sqrt(hF.GetEntries())/hF.GetEntries() * nF
-        if eP < 0.001 : eP = 0.001
-        if eF < 0.001 : eF = 0.001
 
         effis['mcAlt'] = computeEffi(nP,nF,eP,eF)
         rootfile.Close()
@@ -147,8 +144,6 @@ def getAllEffi( info, bindef ):
         nF = fitF.getVal()
         eP = fitP.getError()
         eF = fitF.getError()
-        if eP < 0.001 : eP = 0.001
-        if eF < 0.001 : eF = 0.001
 
         effis['dataNominal'] = computeEffi(nP,nF,eP,eF)
         rootfile.Close()
@@ -164,8 +159,6 @@ def getAllEffi( info, bindef ):
         nF = fitresF.floatParsFinal().find('nSigF').getVal()
         eP = fitresP.floatParsFinal().find('nSigP').getError()
         eF = fitresF.floatParsFinal().find('nSigF').getError()
-        if eP < 0.001 : eP = 0.001
-        if eF < 0.001 : eF = 0.001
 
         effis['dataAltSig'] = computeEffi(nP,nF,eP,eF)
         rootfile.Close()
@@ -182,8 +175,6 @@ def getAllEffi( info, bindef ):
         nF = fitresF.floatParsFinal().find('nSigF').getVal()
         eP = fitresP.floatParsFinal().find('nSigP').getError()
         eF = fitresF.floatParsFinal().find('nSigF').getError()
-        if eP < 0.001 : eP = 0.001
-        if eF < 0.001 : eF = 0.001
 
         effis['dataAltBkg'] = computeEffi(nP,nF,eP,eF)
         rootfile.Close()
