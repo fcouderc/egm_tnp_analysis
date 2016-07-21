@@ -169,6 +169,7 @@ if  args.doPlot:
 ##### dumping egamma txt file 
 ####################################################################
 if args.sumUp:
+    sampleToFit.dump()
     info = {
         'dataNominal' : sampleToFit.nominalFit,
         'dataAltSig'  : sampleToFit.altSigFit ,
@@ -217,4 +218,4 @@ if args.sumUp:
 
     print 'Effis saved in file : ',  effFileName
     import libPython.EGammaID_scaleFactors as egm_sf
-    egm_sf.doEGM_SFs(effFileName,sample.lumi)
+    egm_sf.doEGM_SFs(effFileName,sampleToFit.lumi)

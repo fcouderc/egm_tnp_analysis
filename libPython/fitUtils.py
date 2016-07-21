@@ -7,18 +7,23 @@ rt.gROOT.SetBatch(1)
 from ROOT import tnpFitter
 
 import re
+import math
+
+
+def ptMin( tnpBin ):
+    ptmin = 1
+    if tnpBin['name'].find('pt_') >= 0:
+        ptmin = float(tnpBin['name'].split('pt_')[1].split('p')[0])
+    elif tnpBin['name'].find('et_') >= 0:
+        ptmin = float(tnpBin['name'].split('et_')[1].split('p')[0])
+    return ptmin
 
 def createWorkspaceForAltSig( sample, tnpBin, tnpWorkspaceParam ):
 
     ### tricky: use n < 0 for high pT bin (so need to remove param and add it back)
     cbNList = ['nP','nF']
-    ptMin = -1
-    if tnpBin['name'].find('pt_') >= 0:
-        ptMin = float(tnpBin['name'].split('pt_')[1].split('p')[0])
-    elif tnpBin['name'].find('et_') >= 0:
-        ptMin = float(tnpBin['name'].split('et_')[1].split('p')[0])
-    
-    if ptMin >= 35 :
+    ptmin = ptMin(tnpBin)        
+    if ptmin >= 35 :
         for par in cbNList:
             for ip in range(len(tnpWorkspaceParam)):
                 x=re.compile('%s.*?' % par)
@@ -27,22 +32,10 @@ def createWorkspaceForAltSig( sample, tnpBin, tnpWorkspaceParam ):
                     print '**** remove', ir
                     tnpWorkspaceParam.remove(ir)
                     
-            tnpWorkspaceParam.append( '%s[-1,-3,-0.005]' % (par) )
+            tnpWorkspaceParam.append( '%s[-1,-3,-0.005]' % (par) )                
 
-                
-        
-    tnpWorkspaceFunc = [
-        "RooCBExGaussShape::sigResPass(x,meanP,sigmaP,alphaP,nP, sigmaP_2)",
-        "RooCBExGaussShape::sigResFail(x,meanF,sigmaF,alphaF,nF, sigmaF_2)",
-        "RooCMSShape::bkgPass(x, acmsP, betaP, gammaP, peakP)",
-        "RooCMSShape::bkgFail(x, acmsF, betaF, gammaF, peakF)",
-        ]
-
-    tnpWorkspace = []
-    if sample.mcTruth:
-        tnpWorkspace.extend(tnpWorkspaceParam)
-        tnpWorkspace.extend(tnpWorkspaceFunc)        
-        return tnpWorkspace
+    if sample.isMC:
+        return tnpWorkspaceParam
 
     
     fileref = sample.mcRef.altSigFit
@@ -52,7 +45,7 @@ def createWorkspaceForAltSig( sample, tnpBin, tnpWorkspaceParam ):
     fitresP = filemc.Get( '%s_resP' % tnpBin['name']  )
     fitresF = filemc.Get( '%s_resF' % tnpBin['name'] )
 
-    listOfParam = ['nF','alphaF','nP','alphaP']
+    listOfParam = ['nF','alphaF','nP','alphaP','sigmaP','sigmaF','sigmaP_2','sigmaF_2']
     
     fitPar = fitresF.floatParsFinal()
     for ipar in range(len(fitPar)):
@@ -84,10 +77,7 @@ def createWorkspaceForAltSig( sample, tnpBin, tnpWorkspaceParam ):
                 
     filemc.Close()
 
-    tnpWorkspace.extend(tnpWorkspaceParam)
-    tnpWorkspace.extend(tnpWorkspaceFunc)        
-    print tnpWorkspace
-    return tnpWorkspace
+    return tnpWorkspaceParam
 
 
 #############################################################
@@ -141,14 +131,28 @@ def histFitterNominal( sample, tnpBin, tnpWorkspaceParam ):
 #############################################################
 def histFitterAltSig( sample, tnpBin, tnpWorkspaceParam ):
 
-    tnpWorkspace = createWorkspaceForAltSig( sample,  tnpBin, tnpWorkspaceParam )
-    
+    tnpWorkspacePar = createWorkspaceForAltSig( sample,  tnpBin, tnpWorkspaceParam )
+
+    tnpWorkspaceFunc = [
+        "RooCBExGaussShape::sigResPass(x,meanP,expr('sqrt(sigmaP*sigmaP+sosP*sosP)',{sigmaP,sosP}),alphaP,nP, expr('sqrt(sigmaP_2*sigmaP_2+sosP*sosP)',{sigmaP_2,sosP}))",
+        "RooCBExGaussShape::sigResFail(x,meanF,expr('sqrt(sigmaF*sigmaF+sosF*sosF)',{sigmaF,sosF}),alphaF,nF, expr('sqrt(sigmaF_2*sigmaF_2+sosF*sosF)',{sigmaF_2,sosF}))",
+        "RooCMSShape::bkgPass(x, acmsP, betaP, gammaP, peakP)",
+        "RooCMSShape::bkgFail(x, acmsF, betaF, gammaF, peakF)",
+        ]
+
+    tnpWorkspace = []
+    tnpWorkspace.extend(tnpWorkspacePar)
+    tnpWorkspace.extend(tnpWorkspaceFunc)
+        
+        
     ## init fitter
     infile = rt.TFile(sample.histFile,'read')
     fitter = tnpFitter(infile, tnpBin['name']  )
     infile.Close()
     rootfile = rt.TFile(sample.altSigFit,'update')
     fitter.setOutputFile( rootfile )
+ #   ptmin = ptMin(tnpBin)
+ #   fitter.setMin(2*math.sqrt(ptmin*30) )
 
     
     ## generated Z LineShape
@@ -195,7 +199,7 @@ def histFitterAltBkg( sample, tnpBin, tnpWorkspaceParam ):
     infile.Close()
     rootfile = rt.TFile(sample.altBkgFit,'update')
     fitter.setOutputFile( rootfile )
-    
+
     ## generated Z LineShape
     fileTruth = rt.TFile(sample.mcRef.histFile,'read')
     histZLineShapeP = fileTruth.Get('%s_Pass'%tnpBin['name'])

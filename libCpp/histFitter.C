@@ -100,6 +100,8 @@ void tnpFitter::fits(bool mcTruth,string title) {
   if( mcTruth ) {
     _work->var("nBkgP")->setVal(0); _work->var("nBkgP")->setConstant();
     _work->var("nBkgF")->setVal(0); _work->var("nBkgF")->setConstant();
+    if( _work->var("sosP")  ) _work->var("sosP")->setConstant();
+    if( _work->var("sosF")  ) _work->var("sosF")->setConstant();
     if( _work->var("acmsP")  ) _work->var("acmsP")->setConstant();
     if( _work->var("acmsF")  ) _work->var("acmsF")->setConstant();
     if( _work->var("betaP")  ) _work->var("betaP")->setConstant();
