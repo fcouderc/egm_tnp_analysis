@@ -31,8 +31,8 @@ samplesDef = {
     'tagSel' : tnpSamples.ICHEP2016['mc_DY_madgraph_ele'].clone(),
 }
 ## can add data sample easily
-#samplesDef['data'  ].addSample( tnpSamples.ICHEP2016['data_2016_runC_ele'] )
-#samplesDef['data'  ].addSample( tnpSamples.ICHEP2016['data_2016_runD_ele'] )
+#samplesDef['data'].add_sample( tnpSamples.ICHEP2016['data_2016_runC_ele'] )
+#samplesDef['data'].add_sample( tnpSamples.ICHEP2016['data_2016_runD_ele'] )
 
 ## some sample-based cuts... general cuts defined here after
 ## require mcTruth on MC DY samples and additional cuts
