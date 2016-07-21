@@ -45,7 +45,7 @@ class tnpSample:
         return copy.deepcopy(self)
 
 
-    def addSample(self, sample):
+    def add_sample(self, sample):
         if self.lumi >= 0  :
             self.lumi = self.lumi + sample.lumi
         if self.nEvts >= 0 :
