@@ -20,5 +20,5 @@ ICHEP2016 = {
     'data_2016_runD_pho' :  tnpSample('data_2016_runD_pho', eosDir + 'Photons_76Xids/phov3/data/TnPTree_SingleElectron_2016_RunD.root' , lumi = 4.330 ),
     'data_2016_runB_rec' :  tnpSample('data_2016_runB_rec', eosDir + 'RecoSF/RECOv3/data//TnPTree_SingleElectron_2016_RunB.root'       , lumi = 5.237 ),
     'data_2016_runC_rec' :  tnpSample('data_2016_runC_rec', eosDir + 'RecoSF/RECOv4/data//TnPTree_SingleElectron_2016_RunC.root'       , lumi = 2.646 ),
-    'data_2016_runD_rec' :  None,
+    'data_2016_runD_rec' :  tnpSample('data_2016_runD_rec', eosDir + 'RecoSF/RECOv5/data//TnPTree_SingleElectron_2016_RunD.root'       , lumi = 4.313 ),
 }
