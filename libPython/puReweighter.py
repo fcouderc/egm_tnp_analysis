@@ -4,7 +4,6 @@ import sys
 import argparse
 import os
 
-
 print '** puReweighter requires root_numpy.'
 print '** To install on lxplus: '
 print 'pip install --user root_numpy'
@@ -28,19 +27,20 @@ puMC = {
 puMCscenario = 'Spring2016MC_PUscenarioV1'
 
 
+puDirEOS = 'eos/cms/store/group/phys_egamma/tnp/80X/76Xids/AllIDs_v0/'
 #### Compute weights for all data epoch specified below
 puDataEpoch = {
-    '2016_runB'   : 'etc/inputs/pileup_runB_2016.root',
-    '2016_runC'   : 'etc/inputs/pileup_runC_2016.root',
-    '2016_runD'   : 'etc/inputs/pileup_runD_2016.root',
-    '2016_runBCD' : 'etc/inputs/pileup_runBCD_2016.root'
+    '2016_runB'   : puDirEOS + 'etc/inputs/pileup_runB_2016_63mb.root',
+    '2016_runC'   : puDirEOS + 'etc/inputs/pileup_runC_2016_63mb.root',
+    '2016_runD'   : puDirEOS + 'etc/inputs/pileup_runD_2016_63mb.root',
+    '2016_runBCD' : puDirEOS + 'etc/inputs/pileup_runBCD_2016_63mb.root'
 }
 
 nVtxDataEpoch = {
-    '2016_runB'   : 'etc/inputs/nVtx_runB_2016.root',
-    '2016_runC'   : 'etc/inputs/nVtx_runC_2016.root',
-    '2016_runD'   : 'etc/inputs/nVtx_runD_2016.root',
-    '2016_runBCD' : 'etc/inputs/nVtx_runBCD_2016.root'
+    '2016_runB'   : puDirEOS + 'etc/inputs/nVtx_runB_2016.root',
+    '2016_runC'   : puDirEOS + 'etc/inputs/nVtx_runC_2016.root',
+    '2016_runD'   : puDirEOS + 'etc/inputs/nVtx_runD_2016.root',
+    '2016_runBCD' : puDirEOS + 'etc/inputs/nVtx_runBCD_2016.root'
 }
 
 
@@ -56,13 +56,15 @@ def reweight( sample, useNvtx = False  ):
 ### create a tree with only weights that will be used as friend tree for reweighting different lumi periods
     print 'Opening mc file: ', sample.path[0]
     fmc = rt.TFile(sample.path[0],'read')
-    dirs = fmc.GetListOfKeys()
     tmc = None
-    dirname = None
-    for d in dirs:
-        if (d.GetName() == "sampleInfo"): continue
-        tmc = fmc.Get("%s/fitter_tree" % d.GetName())
-        dirname = d.GetName()
+    if sample.tnpTree is None:
+        dirs = fmc.GetListOfKeys()
+        for d in dirs:
+            if (d.GetName() == "sampleInfo"): continue
+            tmc = fmc.Get("%s/fitter_tree" % d.GetName())
+    else:
+        tmc = fmc.Get(sample.tnpTree)
+    
 
 #### can reweight vs nVtx but better to reweight v truePU
     nVtxMC = []
@@ -73,9 +75,6 @@ def reweight( sample, useNvtx = False  ):
         for ib in range(1,hmc.GetNbinsX()+1):
             nVtxMC.append( hmc.GetBinContent(ib) )
     print 'len nvtxMC = ',len(nVtxMC)
-#    for i in xrange(51):
-#        print "w[nPV =%d ] =  %1.3f"% ( i,hdata.GetBinContent(i+1) )
-#    fmc.cd()
     
     puDataDist = {}
     puDataArray= {}
