@@ -288,6 +288,15 @@ class efficiencyList:
                         ### so this is h2D bin is inside the bining used by e/gamma POG
                         h2.SetBinContent(ix,iy, self.effList[ptBin][etaBin].effData      / self.effList[ptBin][etaBin].effMC)
                         h2.SetBinError  (ix,iy, self.effList[ptBin][etaBin].systCombined / averageMC )
+                        if   onlyError == -3 :
+                            h2.SetBinContent(ix,iy, self.effList[ptBin][etaBin].effData      )
+                            h2.SetBinError  (ix,iy, self.effList[ptBin][etaBin].systCombined * self.effList[ptBin][etaBin].effMC / averageMC )
+                        elif onlyError == -2 :
+                            h2.SetBinContent(ix,iy, self.effList[ptBin][etaBin].effMC)
+                            h2.SetBinError  (ix,iy, 0 )
+                        elif onlyError == -1 :
+                            h2.SetBinContent(ix,iy, self.effList[ptBin][etaBin].effData      / self.effList[ptBin][etaBin].effMC)
+                            h2.SetBinError  (ix,iy, self.effList[ptBin][etaBin].systCombined / averageMC )
                         if onlyError   == 0 :
                             h2.SetBinContent(ix,iy, self.effList[ptBin][etaBin].systCombined      / averageMC  )
                         elif onlyError >= 1 and onlyError <= 6:
@@ -295,7 +304,6 @@ class efficiencyList:
                             if relError:
                                 denominator = self.effList[ptBin][etaBin].systCombined
                             h2.SetBinContent(ix,iy, abs(self.effList[ptBin][etaBin].syst[onlyError-1]) / denominator )
-
         h2.GetXaxis().SetTitle("SuperCluster #eta")
         h2.GetYaxis().SetTitle("p_{T} [GeV]")
         return h2

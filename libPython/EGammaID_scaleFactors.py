@@ -317,6 +317,8 @@ def doEGM_SFs(filein, lumi):
 
 #cDummy.Print( pdfout + "]" )
 
+    h2EffData = effGraph.ptEtaScaleFactor_2DHisto(-3)
+    h2EffMC   = effGraph.ptEtaScaleFactor_2DHisto(-2)
     h2SF    = effGraph.ptEtaScaleFactor_2DHisto(-1)
     h2Error = effGraph.ptEtaScaleFactor_2DHisto( 0)  ## only error bars
 
@@ -352,9 +354,11 @@ def doEGM_SFs(filein, lumi):
     c2D.Print( pdfout )
 
 
-    rootout = rt.TFile(nameOutBase + '_SF2D.root','recreate')
+    rootout = rt.TFile(nameOutBase + '_EGM2D.root','recreate')
     rootout.cd()
     h2SF.Write('EGamma_SF2D',rt.TObject.kOverwrite)
+    h2EffData.Write('EGamma_EffData2D',rt.TObject.kOverwrite)
+    h2EffMC  .Write('EGamma_EffMC2D'  ,rt.TObject.kOverwrite)
     rootout.Close()
 
     for isyst in range(len(efficiency.getSystematicNames())):
