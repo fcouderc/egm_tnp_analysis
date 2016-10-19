@@ -12,9 +12,13 @@ class tnpSample:
         self.puTree  = puTree
         self.isMC    = isMC
         self.weight  = None
-        
+        self.tnpTree = None
+
     def set_weight(self,weight):
         self.weight = weight
+    
+    def set_tnpTree( self, treename):
+        self.tnpTree = treename
 
     def set_puTree(self,puTree):
         self.puTree = puTree
@@ -27,7 +31,8 @@ class tnpSample:
 
     def dump(self):
         print '**** name: %-*s ' % (100, self.name)
-        print '  path   : ', self.path
+        print '  path    : ', self.path
+        print '  tnpTree : ', self.tnpTree
         if self.isMC:
             print '   --- MC sample --- '
             print '  nEvts    : ', self.nEvts
