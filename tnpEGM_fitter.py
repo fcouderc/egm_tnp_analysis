@@ -95,6 +95,10 @@ if args.createHists:
         sample.dump()
 
         var = { 'name' : 'pair_mass', 'nbins' : 60, 'min' : 60, 'max': 120 }
+
+        if sample.mcTruth: 
+            var = { 'name' : 'pair_mass', 'nbins' : 120, 'min' : 60, 'max': 120 }
+            
         tnpRoot.makePassFailHistograms( sample, tnpConf.flags[args.flag], tnpBins, var )
     sys.exit(0)
 

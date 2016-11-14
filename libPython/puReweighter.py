@@ -37,17 +37,28 @@ puDataEpoch = {
 }
 
 nVtxDataEpoch = {
-    '2016_runB'   : puDirEOS + 'etc/inputs/nVtx_runB_2016.root',
-    '2016_runC'   : puDirEOS + 'etc/inputs/nVtx_runC_2016.root',
-    '2016_runD'   : puDirEOS + 'etc/inputs/nVtx_runD_2016.root',
-    '2016_runBCD' : puDirEOS + 'etc/inputs/nVtx_runBCD_2016.root'
+ #   '2016_runB'   : puDirEOS + 'etc/inputs/nVtx_runB_2016.root',
+ #   '2016_runC'   : puDirEOS + 'etc/inputs/nVtx_runC_2016.root',
+ #   '2016_runD'   : puDirEOS + 'etc/inputs/nVtx_runD_2016.root',
+ #   '2016_runBCD' : puDirEOS + 'etc/inputs/nVtx_runBCD_2016.root'
+    '2016_runE'   : 'etc/inputs/nVtx_pu_runE.root',
+    '2016_runGH'  : 'etc/inputs/nVtx_pu_runGH.root',
+}
+
+rhoDataEpoch = {
+ #   '2016_runB'   : puDirEOS + 'etc/inputs/nVtx_runB_2016.root',
+ #   '2016_runC'   : puDirEOS + 'etc/inputs/nVtx_runC_2016.root',
+ #   '2016_runD'   : puDirEOS + 'etc/inputs/nVtx_runD_2016.root',
+ #   '2016_runBCD' : puDirEOS + 'etc/inputs/nVtx_runBCD_2016.root'
+    '2016_runE'   : 'etc/inputs/rho_pu_runE.root',
+    '2016_runGH'  : 'etc/inputs/rho_pu_runGH.root',
 }
 
 
 
 
 
-def reweight( sample, useNvtx = False  ):
+def reweight( sample, puType = 0  ):
     if sample.path is None:
         print '[puReweighter]: Need to know the MC tree (option --mcTree or sample.path)'
         sys.exit(1)
@@ -67,22 +78,37 @@ def reweight( sample, useNvtx = False  ):
     
 
 #### can reweight vs nVtx but better to reweight v truePU
-    nVtxMC = []
-    if useNvtx:
+    puMCnVtx = []
+    puMCrho = []
+    if   puType == 1 :
         hmc   = rt.TH1F('hMC_nPV'  ,'MC nPV'  , 50,-0.5,49.5)
         tmc.Draw('event_nPV>>hMC_nPV','','goff')
         hmc.Scale(1/hmc.Integral())
         for ib in range(1,hmc.GetNbinsX()+1):
-            nVtxMC.append( hmc.GetBinContent(ib) )
-    print 'len nvtxMC = ',len(nVtxMC)
+            puMCnVtx.append( hmc.GetBinContent(ib) )
+        print 'len nvtxMC = ',len(puMCnVtx)
+
+    elif puType == 2 :
+        hmc   = rt.TH1F('hMC_rho'  ,'MC #rho'  , 50,-0.5,49.5)
+        tmc.Draw('rho>>hMC_rho','','goff')
+        hmc.Scale(1/hmc.Integral())
+        for ib in range(1,hmc.GetNbinsX()+1):
+            puMCnVtx.append( hmc.GetBinContent(ib) )
+        print 'len rhoMC = ',len(puMCrho)
     
+
     puDataDist = {}
     puDataArray= {}
     weights = {}
-    for pu in puDataEpoch.keys():
+    epochKeys = puDataEpoch.keys()
+    if puType == 1  : epochKeys = nVtxDataEpoch.keys()
+    if puType == 2  : epochKeys = rhoDataEpoch.keys()
+ 
+    for pu in epochKeys:
         fpu = None
-        if useNvtx : fpu = rt.TFile(nVtxDataEpoch[pu],'read')
-        else       : fpu = rt.TFile(puDataEpoch[pu],'read')
+        if   puType == 1 : fpu = rt.TFile(nVtxDataEpoch[pu],'read')
+        elif puType == 2 : fpu = rt.TFile(rhoDataEpoch[pu],'read')
+        else             : fpu = rt.TFile(puDataEpoch[pu],'read')
         puDataDist[pu] = fpu.Get('pileup').Clone('puHist_%s' % pu)
         puDataDist[pu].Scale(1./puDataDist[pu].Integral())
         puDataDist[pu].SetDirectory(0)
@@ -94,24 +120,29 @@ def reweight( sample, useNvtx = False  ):
         fpu.Close()
         weights[pu] = []
 
-    mcEvts = tree2array( tmc, branches = ['weight','truePU','event_nPV'] )
+    mcEvts = tree2array( tmc, branches = ['weight','truePU','event_nPV','rho'] )
 
 
     pumc = puMC[puMCscenario]
-    if useNvtx:
-        pumc = nVtxMC
+    if   puType == 1:  pumc = puMCnVtx
+    elif puType == 2:  pumc = puMCrho
+    else            :  pumc = puMC[puMCscenario]
+
     puMax = len(pumc)
     print '-> nEvtsTot ', len(mcEvts)
     for ievt in xrange(len(mcEvts)):
         if ievt%1000000 == 0 :            print 'iEvt:',ievt
         evt = mcEvts[ievt]
-        for pu in puDataEpoch.keys():
+        for pu in epochKeys:
             pum = -1
             pud = -1
-            if useNvtx and evt['event_nPV'] < puMax:
+            if puType == 1 and evt['event_nPV'] < puMax:
                 pud = puDataArray[pu][evt['event_nPV']]
                 pum = pumc[evt['event_nPV']]
-            else:
+            if puType == 2 and evt['rho'] < puMax:
+                pud = puDataArray[pu][int(evt['rho'])]
+                pum = pumc[int(evt['rho'])]
+            elif puType == 0:
                 pud = puDataArray[pu][evt['truePU']] 
                 pum = pumc[evt['truePU']]
             puw = 1
@@ -124,7 +155,7 @@ def reweight( sample, useNvtx = False  ):
 
     newFile    = rt.TFile( sample.puTree, 'recreate')
 
-    for pu in puDataEpoch.keys():
+    for pu in epochKeys:
         treeWeight = rt.TTree('weights_%s'%pu,'tree with weights')
         wpuarray = np.array(weights[pu],dtype=[('PUweight',float),('totWeight',float)])
         array2tree( wpuarray, tree = treeWeight )

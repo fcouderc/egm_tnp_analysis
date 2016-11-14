@@ -17,10 +17,10 @@ CMS_lumi.writeExtraText = 1
 CMS_lumi.lumi_sqrtS = "13 TeV"
 
 
-effiMin = 0.48
+effiMin = 0.68
 effiMax = 1.07
 
-sfMin = 0.78
+sfMin = 0.48
 sfMax = 1.22
 
 def isFloat( myFloat ):
@@ -81,7 +81,7 @@ def findMinMax( effis ):
 
     
 
-def EffiGraph1D(effDataList, sfList ,etaPlot,nameout):
+def EffiGraph1D(effDataList, effMCList, sfList ,etaPlot,nameout):
             
     W = 800
     H = 800
@@ -114,11 +114,12 @@ def EffiGraph1D(effDataList, sfList ,etaPlot,nameout):
     igr = 0
     listOfTGraph1 = []
     listOfTGraph2 = []
+    listOfMC      = []
     xMin = 10
     xMax = 200
     if etaPlot:
         xMin = 0.0
-        xMin = -2.60
+#        xMin = -2.60
         xMax = +2.60
     
 
@@ -129,6 +130,13 @@ def EffiGraph1D(effDataList, sfList ,etaPlot,nameout):
     for key in sorted(effDataList.keys()):
         grBinsEffData = effUtil.makeTGraphFromList(effDataList[key], 'min', 'max')
         grBinsSF      = effUtil.makeTGraphFromList(sfList[key]     , 'min', 'max')
+        grBinsEffMC = None
+        if not effMCList is None:
+            grBinsEffMC = effUtil.makeTGraphFromList(effMCList[key], 'min', 'max')
+            grBinsEffMC.SetLineStyle( rt.kDashed )
+            grBinsEffMC.SetLineColor( graphColors[igr] )
+            grBinsEffMC.SetMarkerSize( 0 )
+            grBinsEffMC.SetLineWidth( 2 )
 
         grBinsSF     .SetMarkerColor( graphColors[igr] )
         grBinsSF     .SetLineColor(   graphColors[igr] )
@@ -139,6 +147,8 @@ def EffiGraph1D(effDataList, sfList ,etaPlot,nameout):
                 
         grBinsEffData.GetHistogram().SetMinimum(effiMin)
         grBinsEffData.GetHistogram().SetMaximum(effiMax)
+
+
 
 #        if not etaPlot:
             ### for pT 1D plot, use the actual TGraph range
@@ -174,7 +184,7 @@ def EffiGraph1D(effDataList, sfList ,etaPlot,nameout):
         ### to avoid loosing the TGraph keep it in memory by adding it to a list
         listOfTGraph1.append( grBinsEffData )
         listOfTGraph2.append( grBinsSF ) 
-
+        listOfMC.append( grBinsEffMC   )
         if etaPlot:
             leg.AddEntry( grBinsEffData, '%3.0f #leq p_{T} #leq  %3.0f GeV'   % (float(key[0]),float(key[1])), "PL")        
         else:
@@ -193,12 +203,17 @@ def EffiGraph1D(effDataList, sfList ,etaPlot,nameout):
             
         listOfTGraph1[use_igr].SetLineColor(graphColors[use_igr])
         listOfTGraph1[use_igr].SetMarkerColor(graphColors[use_igr])
+        if not listOfMC[use_igr] is None:
+            listOfMC[use_igr].SetLineColor(graphColors[use_igr])
 
         listOfTGraph1[use_igr].GetHistogram().SetMinimum(effiMin)
         listOfTGraph1[use_igr].GetHistogram().SetMaximum(effiMax)
         p1.cd()
         listOfTGraph1[use_igr].Draw(option)
+        if not listOfMC[use_igr] is None:
+            listOfMC[use_igr].Draw("ez")
 
+        p2.cd()            
         listOfTGraph2[use_igr].SetLineColor(graphColors[use_igr])
         listOfTGraph2[use_igr].SetMarkerColor(graphColors[use_igr])
         listOfTGraph2[use_igr].GetHistogram().SetMinimum(sfMin)
@@ -206,7 +221,6 @@ def EffiGraph1D(effDataList, sfList ,etaPlot,nameout):
         if not etaPlot:
             listOfTGraph2[use_igr].GetHistogram().GetXaxis().SetMoreLogLabels()
         listOfTGraph2[use_igr].GetHistogram().GetXaxis().SetNoExponent()
-        p2.cd()        
         listOfTGraph2[use_igr].Draw(option)
         
 
@@ -310,17 +324,20 @@ def doEGM_SFs(filein, lumi):
     cDummy.Print( pdfout + "[" )
 
 
-    EffiGraph1D( effGraph.pt_1DGraph_list(False) , effGraph.pt_1DGraph_list(True) , False, pdfout )
+    EffiGraph1D( effGraph.pt_1DGraph_list(False) , None, effGraph.pt_1DGraph_list(True) , False, pdfout )
 #EffiGraph1D( effGraph.pt_1DGraph_list_customEtaBining(customEtaBining,False) , 
 #             effGraph.pt_1DGraph_list_customEtaBining(customEtaBining,True)   , False, pdfout )
-    EffiGraph1D( effGraph.eta_1DGraph_list(False), effGraph.eta_1DGraph_list(True), True , pdfout )
-
+#    EffiGraph1D( effGraph.eta_1DGraph_list(False), effGraph.eta_1DGraph_list(True), True , pdfout )
+    EffiGraph1D( effGraph.eta_1DGraph_list( typeGR =  0 ) , # Data
+                 effGraph.eta_1DGraph_list( typeGR = -1 ) , # MC
+                 effGraph.eta_1DGraph_list( typeGR = +1 ) , # SF
+                 True , pdfout )
 #cDummy.Print( pdfout + "]" )
 
     h2EffData = effGraph.ptEtaScaleFactor_2DHisto(-3)
     h2EffMC   = effGraph.ptEtaScaleFactor_2DHisto(-2)
-    h2SF    = effGraph.ptEtaScaleFactor_2DHisto(-1)
-    h2Error = effGraph.ptEtaScaleFactor_2DHisto( 0)  ## only error bars
+    h2SF      = effGraph.ptEtaScaleFactor_2DHisto(-1)
+    h2Error   = effGraph.ptEtaScaleFactor_2DHisto( 0)  ## only error bars
 
     rt.gStyle.SetPalette(1)
     rt.gStyle.SetPaintTextFormat('1.3f');

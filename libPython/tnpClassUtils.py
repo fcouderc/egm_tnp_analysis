@@ -1,4 +1,9 @@
 import copy
+import os
+
+def mkdir(directory):
+    if not os.path.isdir(directory):
+        os.makedirs(directory) 
 
 class tnpSample:
     def __init__(self, sName, path, cut = None, lumi = -1, nEvts = -1, mcTruth = False, puTree = None, isMC = False ):

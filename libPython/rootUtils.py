@@ -37,7 +37,7 @@ def makePassFailHistograms( sample, flag, bindef, var ):
         if not sample.cut is None :
             cuts = '%s && %s' % (cuts,sample.cut)
                 
-        if sample.isMC :
+        if sample.isMC and not sample.weight is None:
             cutPass = '( %s &&  %s ) * %s ' % (cuts, flag, sample.weight)
             cutFail = '( %s && !%s ) * %s ' % (cuts, flag, sample.weight)
         else:
