@@ -3,7 +3,7 @@
 
 ## Install stable branch
 
-> git clone -b egm_fitter_ichep2016_v3 git@github.com:fcouderc/egm_tnp_analysis.git 
+> git clone -b egm_tnp_Moriond17 git@github.com:fcouderc/egm_tnp_analysis.git 
 
 > cd egm_tnp_analysis
 
