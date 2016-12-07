@@ -7,14 +7,21 @@ cutpass90 = '(( abs(probe_sc_eta) < 0.8 && probe_Ele_nonTrigMVA > %f ) ||  ( abs
 
 # flag to be Tested
 flags = {
-    'passingVeto'   : '(passingVeto   == 1)',
-    'passingLoose'  : '(passingLoose  == 1)',
-    'passingMedium' : '(passingMedium == 1)',
-    'passingTight'  : '(passingTight  == 1)',
-    'passingMVA80'  : cutpass80,
-    'passingMVA90'  : cutpass90,
+    'passingVeto'       : '(passingVeto   == 1)',
+    'passingLoose'      : '(passingLoose  == 1)',
+    'passingMedium'     : '(passingMedium == 1)',
+    'passingTight'      : '(passingTight  == 1)',
+    'passingVeto80X'    : '(passingVeto80X   == 1)',
+    'passingLoose80X'   : '(passingLoose80X  == 1)',
+    'passingMedium80X'  : '(passingMedium80X == 1)',
+    'passingTight80X'   : '(passingTight80X  == 1)',
+    'passingMVAwp80'    : cutpass80,
+    'passingMVAwp90'    : cutpass90,
+    'passingMVA80Xwp80' : '(passingMVA80Xwp80 == 1)',
+    'passingMVA80Xwp90' : '(passingMVA80Xwp90 == 1)',
     }
-baseOutDir = 'results/test/'
+
+baseOutDir = 'results/Moriond17/tnpEleID/runGH/'
 
 #############################################################
 ########## samples definition  - preparing the samples
@@ -25,26 +32,35 @@ import etc.inputs.tnpSampleDef as tnpSamples
 tnpTreeDir = 'GsfElectronToEleID'
 
 samplesDef = {
-    'data'   : tnpSamples.ICHEP2016['data_2016_runC_ele'].clone(),
-    'mcNom'  : tnpSamples.ICHEP2016['mc_DY_madgraph_ele'].clone(),
-    'mcAlt'  : tnpSamples.ICHEP2016['mc_DY_amcatnlo_ele'].clone(),
-    'tagSel' : tnpSamples.ICHEP2016['mc_DY_madgraph_ele'].clone(),
+    'data'   : tnpSamples.Moriond17_80X['data_Run2016H'].clone(),
+    'mcNom'  : tnpSamples.Moriond17_80X['DY_madgraph'].clone(),
+    'mcAlt'  : None, #tnpSamples.Moriond17_80X['DY_amcatnlo'].clone(),
+    'tagSel' : None, #tnpSamples.Moriond17_80X['DY_madgraph'].clone(),
 }
 ## can add data sample easily
-#samplesDef['data'].add_sample( tnpSamples.ICHEP2016['data_2016_runC_ele'] )
-#samplesDef['data'].add_sample( tnpSamples.ICHEP2016['data_2016_runD_ele'] )
+samplesDef['data'].add_sample( tnpSamples.Moriond17_80X['data_Run2016G'] )
+#samplesDef['data'].add_sample( tnpSamples.Moriond17_80X['data_Run2016F'] )
+#samplesDef['data'].add_sample( tnpSamples.Moriond17_80X['data_Run2016E'] )
+#samplesDef['data'].add_sample( tnpSamples.Moriond17_80X['data_Run2016D'] )
+#samplesDef['data'].add_sample( tnpSamples.Moriond17_80X['data_Run2016C'] )
+#samplesDef['data'].add_sample( tnpSamples.Moriond17_80X['data_Run2016B'] )
 
 ## some sample-based cuts... general cuts defined here after
 ## require mcTruth on MC DY samples and additional cuts
 ## all the samples MUST have different names (i.e. sample.name must be different for all)
 ## if you need to use 2 times the same sample, then rename the second one
 #samplesDef['data'  ].set_cut('run >= 273726')
+samplesDef['data' ].set_tnpTree(tnpTreeDir)
+if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_tnpTree(tnpTreeDir)
+if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_tnpTree(tnpTreeDir)
+if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_tnpTree(tnpTreeDir)
+
 if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_mcTruth()
 if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_mcTruth()
 if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_mcTruth()
 if not samplesDef['tagSel'] is None:
-    samplesDef['tagSel'].rename('mcAltSel_DY_madgraph_ele')
-    samplesDef['tagSel'].set_cut('tag_Ele_pt > 33  && tag_Ele_nonTrigMVA > 0.90')
+    samplesDef['tagSel'].rename('mcAltSel_DY_madgraph')
+    samplesDef['tagSel'].set_cut('tag_Ele_pt > 33  && tag_Ele_nonTrigMVA80X > 0.95')
 
 ## set MC weight, simple way (use tree weight) 
 #weightName = 'totWeight'
@@ -53,13 +69,13 @@ if not samplesDef['tagSel'] is None:
 #if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_weight(weightName)
 
 ## set MC weight, can use several pileup rw for different data taking periods
-weightName = 'weights_2016_runC.totWeight'
+weightName = 'weights_2016_runGH.totWeight'
 if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_weight(weightName)
 if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_weight(weightName)
 if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_weight(weightName)
-if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_puTree('etc/inputs/ichep2016/mc_DY_madgraph_ele.puTree.root')
-if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_puTree('etc/inputs/ichep2016/mc_DY_amcatnlo_ele.puTree.root')
-if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_puTree('etc/inputs/ichep2016/mc_DY_madgraph_ele.puTree.root')
+if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_puTree('eos/cms/store/group/phys_egamma/tnp/80X/pu/DY_madgraph_ele.pu.puTree.root')
+if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_puTree('eos/cms/store/group/phys_egamma/tnp/80X/pu/DY_amcatnlo_ele.pu.puTree.root')
+if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_puTree('eos/cms/store/group/phys_egamma/tnp/80X/pu/DY_madgraph_ele.pu.puTree.root')
 
 
 #############################################################
@@ -67,14 +83,14 @@ if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_puTree('etc/inputs
 #############################################################
 biningDef = [
    { 'var' : 'probe_sc_eta' , 'type': 'float', 'bins': [-2.5,-2.0,-1.566,-1.4442, -0.8, 0.0, 0.8, 1.4442, 1.566, 2.0, 2.5] },
-   { 'var' : 'probe_Ele_pt' , 'type': 'float', 'bins': [10,20.0,30,40,50,200] },
+   { 'var' : 'probe_Ele_pt' , 'type': 'float', 'bins': [10,20,35,50,100,200,500] },
 ]
 
 #############################################################
 ########## Cuts definition for all samples
 #############################################################
 ### cut
-cutBase   = 'tag_Ele_pt > 30 && abs(tag_sc_eta) < 2.1'
+cutBase   = 'tag_Ele_pt > 30 && abs(tag_sc_eta) < 2.17 && probe_Ele_q*tag_Ele_q < 0'
 
 # can add addtionnal cuts for some bins (first check bin number using tnpEGM --checkBins)
 additionalCuts = { 

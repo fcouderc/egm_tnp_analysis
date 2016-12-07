@@ -3,16 +3,42 @@ from libPython.tnpClassUtils import tnpSample
 ### qll stat
 eosDir1 = 'eos/cms/store/group/phys_egamma/tnp/80X/PhoEleIDs/v1/'
 eosDir2 = 'eos/cms/store/group/phys_egamma/tnp/80X/PhoEleIDs/v2/'
+eosDirREC = 'eos/cms/store/group/phys_egamma/tnp/80X/RecoSF/RECOSFs_2016/'
+eosWinter17 = 'eos/cms/store/group/phys_egamma/tnp/80X/PhoEleIDs/Moriond17_v1/'
 Moriond17_80X = {
-    'DY_madgraph' : tnpSample('DY_madgraph', eosDir1 + 'mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_DYToLL_madgraph.root', 
-                              isMC = True, nEvts = 33584160 ),
-    'data_Run2016B' : tnpSample('data_Run2016B' , eosDir2 + 'data/TnPTree_SingleElectron_2016rereco_RunB.root' , lumi = 5.349 ),
-    'data_Run2016C' : tnpSample('data_Run2016C' , eosDir2 + 'data/TnPTree_SingleElectron_2016rereco_RunC.root' , lumi = 2.363 ),
-    'data_Run2016D' : tnpSample('data_Run2016D' , eosDir2 + 'data/TnPTree_SingleElectron_2016rereco_RunD.root' , lumi = 4.256 ),
-    'data_Run2016E' : tnpSample('data_Run2016E' , eosDir2 + 'data/TnPTree_SingleElectron_2016rereco_RunE.root' , lumi = 3.981 ),
-    'data_Run2016F' : tnpSample('data_Run2016F' , eosDir2 + 'data/TnPTree_SingleElectron_2016rereco_RunF.root' , lumi = 3.105 ),
-    'data_Run2016G' : tnpSample('data_Run2016G' , eosDir2 + 'data/TnPTree_SingleElectron_2016rereco_RunG.root' , lumi = 7.544 ),
-    'data_Run2016H' : tnpSample('data_Run2016H' , eosDir2 + 'data/TnPTree_SingleElectron_2016prompt_RunH.root' , lumi = 6.105 ),
+
+#    'DY_madgraph' : tnpSample('DY_madgraph', eosDir1 + 'mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_DYToLL_madgraph.root', 
+#                              isMC = True, nEvts = 33584160 ),
+#    'data_Run2016B' : tnpSample('data_Run2016B' , eosDir2 + 'data/TnPTree_SingleElectron_2016rereco_RunB.root' , lumi = 5.349 ),
+#    'data_Run2016C' : tnpSample('data_Run2016C' , eosDir2 + 'data/TnPTree_SingleElectron_2016rereco_RunC.root' , lumi = 2.363 ),
+#    'data_Run2016D' : tnpSample('data_Run2016D' , eosDir2 + 'data/TnPTree_SingleElectron_2016rereco_RunD.root' , lumi = 4.256 ),
+#    'data_Run2016E' : tnpSample('data_Run2016E' , eosDir2 + 'data/TnPTree_SingleElectron_2016rereco_RunE.root' , lumi = 3.981 ),
+#    'data_Run2016F' : tnpSample('data_Run2016F' , eosDir2 + 'data/TnPTree_SingleElectron_2016rereco_RunF.root' , lumi = 3.105 ),
+#    'data_Run2016G' : tnpSample('data_Run2016G' , eosDir2 + 'data/TnPTree_SingleElectron_2016rereco_RunG.root' , lumi = 7.544 ),
+#    'data_Run2016H' : tnpSample('data_Run2016H' , eosDir2 + 'data/TnPTree_SingleElectron_2016prompt_RunH.root' , lumi = 6.105 ),
+
+    'DY_madgraph'   : tnpSample('DY_madgraph', eosWinter17 + 'mc//TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_DYToLL_madgraph_Spring16_reHLT.root',
+                                isMC = True, nEvts = -1 ),
+    'data_Run2016B' : tnpSample('data_Run2016B' , eosWinter17 + 'data/TnPTree_SingleElectron_2016rereco_RunB.root' , lumi = 5.767 ),
+    'data_Run2016C' : tnpSample('data_Run2016C' , eosWinter17 + 'data/TnPTree_SingleElectron_2016rereco_RunC.root' , lumi = 2.646 ),
+    'data_Run2016D' : tnpSample('data_Run2016D' , eosWinter17 + 'data/TnPTree_SingleElectron_2016rereco_RunD.root' , lumi = 4.353 ),
+    'data_Run2016E' : tnpSample('data_Run2016E' , eosWinter17 + 'data/TnPTree_SingleElectron_2016rereco_RunE.root' , lumi = 3.985 ),
+    'data_Run2016F' : tnpSample('data_Run2016F' , eosWinter17 + 'data/TnPTree_SingleElectron_2016rereco_RunF.root' , lumi = 3.160 ),
+    'data_Run2016G' : tnpSample('data_Run2016G' , eosWinter17 + 'data/TnPTree_SingleElectron_2016rereco_RunG.root' , lumi = 7.539 ),
+    'data_Run2016H' : tnpSample('data_Run2016H' , eosWinter17 + 'data/TnPTree_SingleElectron_2016prompt_RunH.root' , lumi = 8.762 ),
+
+    
+
+    ### AOD TnP for gsfTracking scale factors
+    'DY_madgraph_MCWinter17_rec' : tnpSample('DY_madgraph_MCWinter17_rec'  , eosDirREC + 'mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_DYToLL_madgraph_Winter2017.root',
+                                             isMC = True, nEvts = 49748967),
+    'data_Run2016B_rec' : tnpSample('data_Run2016B_rec', eosDirREC + 'data/TnPTree_SingleElectron_2016rereco_RunB.root', lumi = 5.899),
+    'data_Run2016C_rec' : tnpSample('data_Run2016C_rec', eosDirREC + 'data/TnPTree_SingleElectron_2016rereco_RunC.root', lumi = 2.646),
+    'data_Run2016D_rec' : tnpSample('data_Run2016D_rec', eosDirREC + 'data/TnPTree_SingleElectron_2016rereco_RunD.root', lumi = 4.353),
+    'data_Run2016E_rec' : tnpSample('data_Run2016E_rec', eosDirREC + 'data/TnPTree_SingleElectron_2016rereco_RunE.root', lumi = 4.050),
+    'data_Run2016F_rec' : tnpSample('data_Run2016F_rec', eosDirREC + 'data/TnPTree_SingleElectron_2016rereco_RunF.root', lumi = 3.160),
+    'data_Run2016G_rec' : tnpSample('data_Run2016G_rec', eosDirREC + 'data/TnPTree_SingleElectron_2016rereco_RunG.root', lumi = 7.391),
+    'data_Run2016H_rec' : tnpSample('data_Run2016H_rec', eosDirREC + 'data/TnPTree_SingleElectron_2016prompt_RunH.root', lumi = 8.762),
     }
 
 Moriond17_80X_prompt = {
