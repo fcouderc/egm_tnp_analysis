@@ -65,9 +65,9 @@ weightName = 'weights_2016_runGH.totWeight'
 if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_weight(weightName)
 if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_weight(weightName)
 if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_weight(weightName)
-if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_puTree('eos/cms/store/group/phys_egamma/tnp/80X/pu/DY_madgraph_ele.pu.puTree.root')
-if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_puTree('eos/cms/store/group/phys_egamma/tnp/80X/pu/DY_amcatnlo_ele.pu.puTree.root')
-if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_puTree('eos/cms/store/group/phys_egamma/tnp/80X/pu/DY_madgraph_ele.pu.puTree.root')
+if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_puTree('eos/cms/store/group/phys_egamma/tnp/80X/pu/DY_madgraph_pho.pu.puTree.root')
+if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_puTree('eos/cms/store/group/phys_egamma/tnp/80X/pu/DY_amcatnlo_pho.pu.puTree.root')
+if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_puTree('eos/cms/store/group/phys_egamma/tnp/80X/pu/DY_madgraph_pho.pu.puTree.root')
 
 
 #############################################################
