@@ -120,8 +120,8 @@ def EffiGraph1D(effDataList, effMCList, sfList ,nameout, xAxis = 'pT', yAxis = '
         xMin = 10
         xMax = 500
     elif 'vtx' in xAxis or 'Vtx' in xAxis or 'PV' in xAxis:
-        xMin =  0
-        xMax = 45
+        xMin =  3
+        xMax = 42
     elif 'eta' in xAxis or 'Eta' in xAxis:
         xMin = -2.60
         xMax = +2.60
@@ -135,6 +135,7 @@ def EffiGraph1D(effDataList, effMCList, sfList ,nameout, xAxis = 'pT', yAxis = '
 
     sfminmax =  findMinMax( sfList )
     sfMin = sfminmax[0]
+    sfMin = 0.72
     sfMax = 1.06
 
     for key in sorted(effDataList.keys()):

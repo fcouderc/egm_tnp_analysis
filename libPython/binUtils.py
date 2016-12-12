@@ -38,10 +38,15 @@ def createBins( bining, cut ):
 
     listOfBins = []
     ibin = 0
+    nbins = len(listOfIndex)
     for ix in listOfIndex:
         ### make bin definition
         binCut   = None
-        binName  = 'bin%s'%ibin
+        binName  = 'bin%02d'%ibin
+        if nbins > 100   :  binName  = 'bin%03d'%ibin
+        if nbins > 1000  :  binName  = 'bin%04d'%ibin
+        if nbins > 10000 :  binName  = 'bin%d'%ibin
+
         binTitle = ''
         if not cut is None:
             binCut = cut

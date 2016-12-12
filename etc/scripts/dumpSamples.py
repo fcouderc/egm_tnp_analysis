@@ -1,9 +1,8 @@
-import libPython.puReweighter as pu
-from libPython.tnpSampleUtils import *
+from libPython.tnpClassUtils import *
 import etc.inputs.tnpSampleDef as tnpSamples
         
 
-for sName in tnpSamples.ICHEP2016.keys():
-    sample = tnpSamples.ICHEP2016[sName]
+for sName in tnpSamples.Moriond17_80X.keys():
+    sample = tnpSamples.Moriond17_80X[sName]
     if not sample is None:    sample.dump()
     

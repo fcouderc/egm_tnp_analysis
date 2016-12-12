@@ -175,6 +175,7 @@ if  args.doPlot:
 if args.sumUp:
     sampleToFit.dump()
     info = {
+        'data'        : sampleToFit.histFile,
         'dataNominal' : sampleToFit.nominalFit,
         'dataAltSig'  : sampleToFit.altSigFit ,
         'dataAltBkg'  : sampleToFit.altBkgFit ,

@@ -137,16 +137,25 @@ def getAllEffi( info, bindef ):
         from ROOT import RooFit,RooFitResult
         fitresP = rootfile.Get( '%s_resP' % bindef['name']  )
         fitresF = rootfile.Get( '%s_resF' % bindef['name'] )
+
         fitP = fitresP.floatParsFinal().find('nSigP')
         fitF = fitresF.floatParsFinal().find('nSigF')
-
+        
         nP = fitP.getVal()
         nF = fitF.getVal()
         eP = fitP.getError()
         eF = fitF.getError()
+        rootfile.Close()
+
+        rootfile = rt.TFile( info['data'], 'read' )
+        hP = rootfile.Get('%s_Pass'%bindef['name'])
+        hF = rootfile.Get('%s_Fail'%bindef['name'])
+
+        if eP > math.sqrt(hP.Integral()) : eP = math.sqrt(hP.Integral())
+        if eF > math.sqrt(hF.Integral()) : eF = math.sqrt(hF.Integral())
+        rootfile.Close()
 
         effis['dataNominal'] = computeEffi(nP,nF,eP,eF)
-        rootfile.Close()
     else:
         effis['dataNominal'] = [-1,-1]
     if not info['dataAltSig'] is None and os.path.isfile(info['dataAltSig']) :
@@ -159,9 +168,18 @@ def getAllEffi( info, bindef ):
         nF = fitresF.floatParsFinal().find('nSigF').getVal()
         eP = fitresP.floatParsFinal().find('nSigP').getError()
         eF = fitresF.floatParsFinal().find('nSigF').getError()
+        rootfile.Close()
+
+        rootfile = rt.TFile( info['data'], 'read' )
+        hP = rootfile.Get('%s_Pass'%bindef['name'])
+        hF = rootfile.Get('%s_Fail'%bindef['name'])
+
+        if eP > math.sqrt(hP.Integral()) : eP = math.sqrt(hP.Integral())
+        if eF > math.sqrt(hF.Integral()) : eF = math.sqrt(hF.Integral())
+        rootfile.Close()
 
         effis['dataAltSig'] = computeEffi(nP,nF,eP,eF)
-        rootfile.Close()
+
     else:
         effis['dataAltSig'] = [-1,-1]
 
@@ -175,9 +193,17 @@ def getAllEffi( info, bindef ):
         nF = fitresF.floatParsFinal().find('nSigF').getVal()
         eP = fitresP.floatParsFinal().find('nSigP').getError()
         eF = fitresF.floatParsFinal().find('nSigF').getError()
+        rootfile.Close()
+
+        rootfile = rt.TFile( info['data'], 'read' )
+        hP = rootfile.Get('%s_Pass'%bindef['name'])
+        hF = rootfile.Get('%s_Fail'%bindef['name'])
+
+        if eP > math.sqrt(hP.Integral()) : eP = math.sqrt(hP.Integral())
+        if eF > math.sqrt(hF.Integral()) : eF = math.sqrt(hF.Integral())
+        rootfile.Close()
 
         effis['dataAltBkg'] = computeEffi(nP,nF,eP,eF)
-        rootfile.Close()
     else:
         effis['dataAltBkg'] = [-1,-1]
     return effis
