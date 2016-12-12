@@ -37,11 +37,10 @@ def makePassFailHistograms( sample, flag, bindef, var ):
             cuts = '%s && %s' % (cuts,sample.cut)
 
         notflag = '!(%s)' % flag
-
-        for aVar in bindef['bins'][ib]['vars'].keys():
-            if 'pt' in aVar or 'pT' in aVar or 'et' in aVar or 'eT' in aVar:
-                ## for high pT change the failing spectra to any probe to get statistics
-                if bindef['bins'][ib]['vars'][aVar]['min'] > 89: notflag = '( %s  || !(%s) )' % (flag,flag)
+#        for aVar in bindef['bins'][ib]['vars'].keys():
+#            if 'pt' in aVar or 'pT' in aVar or 'et' in aVar or 'eT' in aVar:
+#                ## for high pT change the failing spectra to any probe to get statistics
+#                if bindef['bins'][ib]['vars'][aVar]['min'] > 89: notflag = '( %s  || !(%s) )' % (flag,flag)
 
         if sample.isMC and not sample.weight is None:
             cutPass = '( %s && %s ) * %s ' % (cuts,    flag, sample.weight)
@@ -49,7 +48,6 @@ def makePassFailHistograms( sample, flag, bindef, var ):
             if sample.maxWeight < 999:
                 cutPass = '( %s && %s ) * (%s < %f ? %s : 1.0 )' % (cuts,    flag, sample.weight,sample.maxWeight,sample.weight)
                 cutFail = '( %s && %s ) * (%s < %f ? %s : 1.0 )' % (cuts, notflag, sample.weight,sample.maxWeight,sample.weight)
-            print cutPass
         else:
             cutPass = '( %s && %s )' % (cuts,    flag)
             cutFail = '( %s && %s )' % (cuts, notflag)
