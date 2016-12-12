@@ -18,9 +18,13 @@ class tnpSample:
         self.isMC    = isMC
         self.weight  = None
         self.tnpTree = None
+        self.maxWeight = 999999
 
     def set_weight(self,weight):
         self.weight = weight
+
+    def set_maxWeight(self, maxi):
+        self.maxWeight = maxi
     
     def set_tnpTree( self, treename):
         self.tnpTree = treename
