@@ -25,7 +25,6 @@ def makePassFailHistograms( sample, flag, bindef, var ):
     hPass = []
     hFail = []
     for ib in range(len(bindef['bins'])):
-        
         hPass.append(rt.TH1D('%s_Pass' % bindef['bins'][ib]['name'],bindef['bins'][ib]['title'],var['nbins'],var['min'],var['max']))
         hFail.append(rt.TH1D('%s_Fail' % bindef['bins'][ib]['name'],bindef['bins'][ib]['title'],var['nbins'],var['min'],var['max']))
         hPass[ib].Sumw2()
@@ -36,17 +35,24 @@ def makePassFailHistograms( sample, flag, bindef, var ):
             cuts = '%s && mcTrue==1' % cuts
         if not sample.cut is None :
             cuts = '%s && %s' % (cuts,sample.cut)
-                
+
+        notflag = '!(%s)' % flag
+
+        for aVar in bindef['bins'][ib]['vars'].keys():
+            if 'pt' in aVar or 'pT' in aVar or 'et' in aVar or 'eT' in aVar:
+                ## for high pT change the failing spectra to any probe to get statistics
+                if bindef['bins'][ib]['vars'][aVar]['min'] > 89: notflag = '( %s  || !(%s) )' % (flag,flag)
+
         if sample.isMC and not sample.weight is None:
-            cutPass = '( %s &&  %s ) * %s ' % (cuts, flag, sample.weight)
-            cutFail = '( %s && !%s ) * %s ' % (cuts, flag, sample.weight)
+            cutPass = '( %s && %s ) * %s ' % (cuts,    flag, sample.weight)
+            cutFail = '( %s && %s ) * %s ' % (cuts, notflag, sample.weight)
             if sample.maxWeight < 999:
-                cutPass = '( %s &&  %s ) * (%s < %f ? %s : 1.0 )' % (cuts, flag, sample.weight,sample.maxWeight,sample.weight)
-                cutFail = '( %s && !%s ) * (%s < %f ? %s : 1.0 )' % (cuts, flag, sample.weight,sample.maxWeight,sample.weight)
+                cutPass = '( %s && %s ) * (%s < %f ? %s : 1.0 )' % (cuts,    flag, sample.weight,sample.maxWeight,sample.weight)
+                cutFail = '( %s && %s ) * (%s < %f ? %s : 1.0 )' % (cuts, notflag, sample.weight,sample.maxWeight,sample.weight)
             print cutPass
         else:
-            cutPass = '( %s &&  %s )' % (cuts, flag)
-            cutFail = '( %s && !%s )' % (cuts, flag)
+            cutPass = '( %s && %s )' % (cuts,    flag)
+            cutFail = '( %s && %s )' % (cuts, notflag)
         
         tree.Draw('%s >> %s' % (var['name'],hPass[ib].GetName()),cutPass,'goff')
         tree.Draw('%s >> %s' % (var['name'],hFail[ib].GetName()),cutFail,'goff')

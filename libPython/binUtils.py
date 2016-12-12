@@ -48,8 +48,10 @@ def createBins( bining, cut ):
         if nbins > 10000 :  binName  = 'bin%d'%ibin
 
         binTitle = ''
+        binVars = {}
         if not cut is None:
             binCut = cut
+
         for iv in range(len(ix)):
             var     = bining[iv]['var']
             bins1D  = bining[iv]['bins']
@@ -62,6 +64,7 @@ def createBins( bining, cut ):
                     binCut   = '%s && %s >= %f && %s < %f' % (binCut  ,var,bins1D[ix[iv]],var,bins1D[ix[iv]+1])
                     binTitle = '%s; %1.3f < %s < %1.3f'    % (binTitle,bins1D[ix[iv]],var,bins1D[ix[iv]+1])
                 binName  = '%s_%s_%1.2fTo%1.2f'  % (binName ,var,bins1D[ix[iv]],bins1D[ix[iv]+1])
+                binVars[var] = { 'min': bins1D[ix[iv]], 'max': bins1D[ix[iv]+1]}
 
                 
             if varType == 'int' :
@@ -72,10 +75,12 @@ def createBins( bining, cut ):
                     binCut   = '%s && %s == %d' % (binCut,var,bins1D[ix[iv]])
                     binTitle = '%s; %s = %d'    % (binTitle,var,bins1D[ix[iv]])
                 binName  = '%s_%sEq%d' % (binName ,var,bins1D[ix[iv]])
+                binVars[var] = { 'min': bins1D[ix[iv]], 'max': bins1D[ix[iv]]}
+
             binName = binName.replace('-','m')
             binName = binName.replace('.','p')
 
-        listOfBins.append({'cut' : binCut, 'title': binTitle, 'name' : binName })
+        listOfBins.append({'cut' : binCut, 'title': binTitle, 'name' : binName, 'vars' : binVars })
         ibin = ibin + 1
  
     listOfVars = []
@@ -91,7 +96,7 @@ def createBins( bining, cut ):
 def tuneCuts( bindef, cuts ) :
     if cuts is None:
         return
-
+    
     for ibin in cuts.keys():
         cut0 = bindef['bins'][ibin]['cut']
         cut1 = cuts[ibin]
