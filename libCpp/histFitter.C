@@ -26,6 +26,7 @@ using namespace std;
 class tnpFitter {
 public:
   tnpFitter( TFile *file, std::string histname  );
+  tnpFitter( TH1 *hPass, TH1 *hFail, std::string histname  );
   ~tnpFitter(void) {if( _work != 0 ) delete _work; }
   void setZLineShapes(TH1 *hZPass, TH1 *hZFail );
   void setWorkspace(std::vector<std::string>);
@@ -60,6 +61,23 @@ tnpFitter::tnpFitter(TFile *filein, std::string histname   ) : _useMinos(false) 
   _work->import(rooFail) ;
 
 }
+
+tnpFitter::tnpFitter(TH1 *hPass, TH1 *hFail, std::string histname  ) : _useMinos(false) {
+  RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING);
+  _histname_base = histname;
+
+  _nTotP = hPass->Integral();
+  _nTotF = hFail->Integral();
+
+  _work = new RooWorkspace("w") ;
+  _work->factory("x[50,150]");
+
+  RooDataHist rooPass("hPass","hPass",*_work->var("x"),hPass);
+  RooDataHist rooFail("hFail","hFail",*_work->var("x"),hFail);
+  _work->import(rooPass) ;
+  _work->import(rooFail) ;
+}
+
 
 void tnpFitter::setZLineShapes(TH1 *hZPass, TH1 *hZFail ) {
   RooDataHist rooPass("hGenZPass","hGenZPass",*_work->var("x"),hZPass);

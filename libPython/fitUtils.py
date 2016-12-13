@@ -53,13 +53,10 @@ def createWorkspaceForAltSig( sample, tnpBin, tnpWorkspaceParam ):
         print '%s[%2.3f]' % (pName,fitPar[ipar].getVal())
         for par in listOfParam:
             if pName == par:
-                print ' *** should remove param ', pName 
                 x=re.compile('%s.*?' % pName)
                 listToRM = filter(x.match, tnpWorkspaceParam)
                 for ir in listToRM :
-                    print '**** remove', ir
-                    tnpWorkspaceParam.remove(ir)
-                    
+                    tnpWorkspaceParam.remove(ir)                    
                 tnpWorkspaceParam.append( '%s[%2.3f]' % (pName,fitPar[ipar].getVal()) )
                               
   
@@ -95,21 +92,27 @@ def histFitterNominal( sample, tnpBin, tnpWorkspaceParam ):
     tnpWorkspace = []
     tnpWorkspace.extend(tnpWorkspaceParam)
     tnpWorkspace.extend(tnpWorkspaceFunc)
-
     
     ## init fitter
     infile = rt.TFile( sample.histFile, "read")
-    fitter = tnpFitter( infile, tnpBin['name']  )
-    fitter.useMinos()
+    hP = infile.Get('%s_Pass' % tnpBin['name'] )
+    hF = infile.Get('%s_Fail' % tnpBin['name'] )
+    fitter = tnpFitter( hP, hF, tnpBin['name'] )
     infile.Close()
+
+    ## setup
+    fitter.useMinos()
     rootfile = rt.TFile(sample.nominalFit,'update')
     fitter.setOutputFile( rootfile )
     
     ## generated Z LineShape
+    ## for high pT change the failing spectra to any probe to get statistics
     fileTruth  = rt.TFile(sample.mcRef.histFile,'read')
     histZLineShapeP = fileTruth.Get('%s_Pass'%tnpBin['name'])
     histZLineShapeF = fileTruth.Get('%s_Fail'%tnpBin['name'])
+    if ptMin( tnpBin ) > 89: histZLineShapeF = fileTruth.Get('%s_Pass'%tnpBin['name'])
     fitter.setZLineShapes(histZLineShapeP,histZLineShapeF)
+
     fileTruth.Close()
 
     ### set workspace
@@ -144,16 +147,19 @@ def histFitterAltSig( sample, tnpBin, tnpWorkspaceParam ):
     tnpWorkspace.extend(tnpWorkspacePar)
     tnpWorkspace.extend(tnpWorkspaceFunc)
         
-        
     ## init fitter
-    infile = rt.TFile(sample.histFile,'read')
-    fitter = tnpFitter(infile, tnpBin['name']  )
+    infile = rt.TFile( sample.histFile, "read")
+    hP = infile.Get('%s_Pass' % tnpBin['name'] )
+    hF = infile.Get('%s_Fail' % tnpBin['name'] )
+    ## for high pT change the failing spectra to passing probe to get statistics 
+    ## MC only: this is to get MC parameters in data fit!
+    if sample.isMC and ptMin( tnpBin ) > 89:     hF = infile.Get('%s_Pass' % tnpBin['name'] )
+    fitter = tnpFitter( hP, hF, tnpBin['name'] )
     infile.Close()
+
+    ## setup
     rootfile = rt.TFile(sample.altSigFit,'update')
     fitter.setOutputFile( rootfile )
- #   ptmin = ptMin(tnpBin)
- #   fitter.setMin(2*math.sqrt(ptmin*30) )
-
     
     ## generated Z LineShape
     fileTruth = rt.TFile('etc/inputs/ZeeGenLevel.root','read')
@@ -191,19 +197,24 @@ def histFitterAltBkg( sample, tnpBin, tnpWorkspaceParam ):
     tnpWorkspace = []
     tnpWorkspace.extend(tnpWorkspaceParam)
     tnpWorkspace.extend(tnpWorkspaceFunc)
-
-    
+            
     ## init fitter
-    infile = rt.TFile(sample.histFile,"read")
-    fitter = tnpFitter( infile, tnpBin['name']  )
+    infile = rt.TFile(sample.histFile,'read')
+    hP = infile.Get('%s_Pass' % tnpBin['name'] )
+    hF = infile.Get('%s_Fail' % tnpBin['name'] )
+    fitter = tnpFitter( hP, hF, tnpBin['name'] )
     infile.Close()
+
+    ## setup
     rootfile = rt.TFile(sample.altBkgFit,'update')
     fitter.setOutputFile( rootfile )
 
     ## generated Z LineShape
+    ## for high pT change the failing spectra to any probe to get statistics
     fileTruth = rt.TFile(sample.mcRef.histFile,'read')
     histZLineShapeP = fileTruth.Get('%s_Pass'%tnpBin['name'])
     histZLineShapeF = fileTruth.Get('%s_Fail'%tnpBin['name'])
+    if ptMin( tnpBin ) > 89: histZLineShapeF = fileTruth.Get('%s_Pass'%tnpBin['name'])
     fitter.setZLineShapes(histZLineShapeP,histZLineShapeF)
     fileTruth.Close()
 
