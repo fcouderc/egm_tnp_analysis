@@ -11,6 +11,7 @@ parser = argparse.ArgumentParser(description='tnp EGM fitter')
 parser.add_argument('--checkBins'  , action='store_true'  , help = 'check  bining definition')
 parser.add_argument('--createBins' , action='store_true'  , help = 'create bining definition')
 parser.add_argument('--createHists', action='store_true'  , help = 'create histograms')
+parser.add_argument('--sample'     , default='all'        , help = 'create histograms (per sample, expert only)')
 parser.add_argument('--altSig'     , action='store_true'  , help = 'alternate signal model fit')
 parser.add_argument('--altBkg'     , action='store_true'  , help = 'alternate background model fit')
 parser.add_argument('--doFit'      , action='store_true'  , help = 'fit sample (sample should be defined in settings.py)')
@@ -91,15 +92,14 @@ if args.createHists:
     for sampleType in tnpConf.samplesDef.keys():
         sample =  tnpConf.samplesDef[sampleType]
         if sample is None : continue
-        print 'creating histogram for sample '
-        sample.dump()
+        if sampleType == args.sample or args.sample == 'all' :
+            print 'creating histogram for sample '
+            sample.dump()
+            var = { 'name' : 'pair_mass', 'nbins' : 80, 'min' : 50, 'max': 130 }
+            if sample.mcTruth:
+                var = { 'name' : 'pair_mass', 'nbins' : 80, 'min' : 50, 'max': 130 }
+            tnpRoot.makePassFailHistograms( sample, tnpConf.flags[args.flag], tnpBins, var )
 
-        var = { 'name' : 'pair_mass', 'nbins' : 60, 'min' : 60, 'max': 120 }
-
-        if sample.mcTruth: 
-            var = { 'name' : 'pair_mass', 'nbins' : 120, 'min' : 60, 'max': 120 }
-            
-        tnpRoot.makePassFailHistograms( sample, tnpConf.flags[args.flag], tnpBins, var )
     sys.exit(0)
 
 
