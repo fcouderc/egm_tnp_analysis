@@ -10,6 +10,8 @@ import re
 import math
 
 
+minPtForSwitch = 70
+
 def ptMin( tnpBin ):
     ptmin = 1
     if tnpBin['name'].find('pt_') >= 0:
@@ -71,7 +73,7 @@ def createWorkspaceForAltSig( sample, tnpBin, tnpWorkspaceParam ):
                 for ir in listToRM :
                     tnpWorkspaceParam.remove(ir)
                 tnpWorkspaceParam.append( '%s[%2.3f]' % (pName,fitPar[ipar].getVal()) )
-                
+
     filemc.Close()
 
     return tnpWorkspaceParam
@@ -110,7 +112,9 @@ def histFitterNominal( sample, tnpBin, tnpWorkspaceParam ):
     fileTruth  = rt.TFile(sample.mcRef.histFile,'read')
     histZLineShapeP = fileTruth.Get('%s_Pass'%tnpBin['name'])
     histZLineShapeF = fileTruth.Get('%s_Fail'%tnpBin['name'])
-    if ptMin( tnpBin ) > 89: histZLineShapeF = fileTruth.Get('%s_Pass'%tnpBin['name'])
+    if ptMin( tnpBin ) > minPtForSwitch: 
+        histZLineShapeF = fileTruth.Get('%s_Pass'%tnpBin['name'])
+#        fitter.fixSigmaFtoSigmaP()
     fitter.setZLineShapes(histZLineShapeP,histZLineShapeF)
 
     fileTruth.Close()
@@ -153,8 +157,10 @@ def histFitterAltSig( sample, tnpBin, tnpWorkspaceParam ):
     hF = infile.Get('%s_Fail' % tnpBin['name'] )
     ## for high pT change the failing spectra to passing probe to get statistics 
     ## MC only: this is to get MC parameters in data fit!
-    if sample.isMC and ptMin( tnpBin ) > 89:     hF = infile.Get('%s_Pass' % tnpBin['name'] )
+    if sample.isMC and ptMin( tnpBin ) > minPtForSwitch:     
+        hF = infile.Get('%s_Pass' % tnpBin['name'] )
     fitter = tnpFitter( hP, hF, tnpBin['name'] )
+#    fitter.fixSigmaFtoSigmaP()
     infile.Close()
 
     ## setup
@@ -214,7 +220,9 @@ def histFitterAltBkg( sample, tnpBin, tnpWorkspaceParam ):
     fileTruth = rt.TFile(sample.mcRef.histFile,'read')
     histZLineShapeP = fileTruth.Get('%s_Pass'%tnpBin['name'])
     histZLineShapeF = fileTruth.Get('%s_Fail'%tnpBin['name'])
-    if ptMin( tnpBin ) > 89: histZLineShapeF = fileTruth.Get('%s_Pass'%tnpBin['name'])
+    if ptMin( tnpBin ) > minPtForSwitch: 
+        histZLineShapeF = fileTruth.Get('%s_Pass'%tnpBin['name'])
+#        fitter.fixSigmaFtoSigmaP()
     fitter.setZLineShapes(histZLineShapeP,histZLineShapeF)
     fileTruth.Close()
 

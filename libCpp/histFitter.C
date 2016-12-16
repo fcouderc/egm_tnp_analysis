@@ -35,15 +35,18 @@ public:
   void useMinos(bool minos = true) {_useMinos = minos;}
   void textParForCanvas(RooFitResult *resP, RooFitResult *resF, TPad *p);
   
+  void fixSigmaFtoSigmaP(bool fix=true) { _fixSigmaFtoSigmaP= fix;}
+  
 private:
   RooWorkspace *_work;
   std::string _histname_base;
   TFile *_fOut;
   double _nTotP, _nTotF;
   bool _useMinos;
+  bool _fixSigmaFtoSigmaP;
 };
 
-tnpFitter::tnpFitter(TFile *filein, std::string histname   ) : _useMinos(false) {
+tnpFitter::tnpFitter(TFile *filein, std::string histname   ) : _useMinos(false),_fixSigmaFtoSigmaP(false) {
   RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING);
   _histname_base = histname;  
 
@@ -53,7 +56,7 @@ tnpFitter::tnpFitter(TFile *filein, std::string histname   ) : _useMinos(false) 
   _nTotF = hFail->Integral();
 
   _work = new RooWorkspace("w") ;
-  _work->factory("x[50,150]");
+  _work->factory("x[50,130]");
 
   RooDataHist rooPass("hPass","hPass",*_work->var("x"),hPass);
   RooDataHist rooFail("hFail","hFail",*_work->var("x"),hFail);
@@ -62,7 +65,7 @@ tnpFitter::tnpFitter(TFile *filein, std::string histname   ) : _useMinos(false) 
 
 }
 
-tnpFitter::tnpFitter(TH1 *hPass, TH1 *hFail, std::string histname  ) : _useMinos(false) {
+tnpFitter::tnpFitter(TH1 *hPass, TH1 *hFail, std::string histname  ) : _useMinos(false),_fixSigmaFtoSigmaP(false) {
   RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING);
   _histname_base = histname;
 
@@ -70,7 +73,7 @@ tnpFitter::tnpFitter(TH1 *hPass, TH1 *hFail, std::string histname  ) : _useMinos
   _nTotF = hFail->Integral();
 
   _work = new RooWorkspace("w") ;
-  _work->factory("x[50,150]");
+  _work->factory("x[50,130]");
 
   RooDataHist rooPass("hPass","hPass",*_work->var("x"),hPass);
   RooDataHist rooFail("hFail","hFail",*_work->var("x"),hFail);
@@ -129,12 +132,20 @@ void tnpFitter::fits(bool mcTruth,string title) {
     //    if( _work->var("toto") ) _work->var("toto")->setConstant();
   }
 
-  RooFitResult* resPass = pdfPass->fitTo(*_work->data("hPass"),Minos(_useMinos),SumW2Error(kTRUE),Save());
-  RooFitResult* resFail = pdfFail->fitTo(*_work->data("hFail"),Minos(_useMinos),SumW2Error(kTRUE),Save());
+  _work->var("x")->setRange("fitMassRange",60,120);
+  RooFitResult* resPass = pdfPass->fitTo(*_work->data("hPass"),Minos(_useMinos),SumW2Error(kTRUE),Save(),Range("fitMassRange"));
+  if( _fixSigmaFtoSigmaP ) {
+    _work->var("sigmaF")->setVal( _work->var("sigmaP")->getVal() );
+    _work->var("sigmaF")->setConstant();
+  }
+
+  _work->var("sigmaF")->setVal(_work->var("sigmaP")->getVal());
+  _work->var("sigmaF")->setRange(0.8* _work->var("sigmaP")->getVal(), 3.0* _work->var("sigmaP")->getVal());
+  RooFitResult* resFail = pdfFail->fitTo(*_work->data("hFail"),Minos(_useMinos),SumW2Error(kTRUE),Save(),Range("fitMassRange"));
 
 
-  RooPlot *pPass = _work->var("x")->frame();
-  RooPlot *pFail = _work->var("x")->frame();
+  RooPlot *pPass = _work->var("x")->frame(60,120);
+  RooPlot *pFail = _work->var("x")->frame(60,120);
   pPass->SetTitle("passing probe");
   pFail->SetTitle("failing probe");
   
