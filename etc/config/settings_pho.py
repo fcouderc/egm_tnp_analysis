@@ -25,9 +25,9 @@ tnpTreeDir = 'GsfElectronToPhoID'
 
 samplesDef = {
     'data'   : tnpSamples.Moriond17_80X['data_Run2016H'].clone(),
-    'mcNom'  : tnpSamples.Moriond17_80X['DY_madgraph'].clone(),
-    'mcAlt'  : None, #tnpSamples.Moriond17_80X['DY_amcatnlo'].clone(),
-    'tagSel' : None, #tnpSamples.Moriond17_80X['DY_madgraph'].clone(),
+    'mcNom'  : tnpSamples.Moriond17_80X['DY_madgraph_Winter17'].clone(),
+    'mcAlt'  : tnpSamples.Moriond17_80X['DY_amcatnlo_Winter17'].clone(),
+    'tagSel' : tnpSamples.Moriond17_80X['DY_madgraph_Winter17'].clone(),
 }
 ## can add data sample easily
 samplesDef['data'].add_sample( tnpSamples.Moriond17_80X['data_Run2016G'] )
@@ -52,7 +52,7 @@ if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_mcTruth()
 if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_mcTruth()
 if not samplesDef['tagSel'] is None:
     samplesDef['tagSel'].rename('mcAltSel_DY_madgraph')
-    samplesDef['tagSel'].set_cut('tag_Ele_pt > 33  && tag_Ele_nonTrigMVA80X > 0.95')
+    samplesDef['tagSel'].set_cut('tag_Ele_pt > 35  && tag_Ele_nonTrigMVA80X > 0.95')
 
 ## set MC weight, simple way (use tree weight) 
 #weightName = 'totWeight'
@@ -65,9 +65,9 @@ weightName = 'weights_2016_runGH.totWeight'
 if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_weight(weightName)
 if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_weight(weightName)
 if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_weight(weightName)
-if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_puTree('eos/cms/store/group/phys_egamma/tnp/80X/pu/DY_madgraph_pho.pu.puTree.root')
-if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_puTree('eos/cms/store/group/phys_egamma/tnp/80X/pu/DY_amcatnlo_pho.pu.puTree.root')
-if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_puTree('eos/cms/store/group/phys_egamma/tnp/80X/pu/DY_madgraph_pho.pu.puTree.root')
+if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_puTree('eos/cms/store/group/phys_egamma/tnp/80X/pu/Winter17/DY_madgraph_Winter17_pho.pu.puTree.root')
+if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_puTree('eos/cms/store/group/phys_egamma/tnp/80X/pu/Winter17/DY_amcatnlo_Winter17_pho.pu.puTree.root')
+if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_puTree('eos/cms/store/group/phys_egamma/tnp/80X/pu/Winter17/DY_madgraph_Winter17_pho.pu.puTree.root')
 
 
 #############################################################
@@ -105,10 +105,10 @@ additionalCuts = {
 ########## fitting params to tune fit by hand if necessary
 #############################################################
 tnpParNomFit = [
-    "meanP[-0.0,-5.0,5.0]","sigmaP[0.5,0.1,5.0]",
-    "meanF[-0.0,-5.0,5.0]","sigmaF[0.5,0.1,5.0]",
-    "acmsP[60.,50.,80.]","betaP[0.05,0.01,0.08]","gammaP[0.1, 0, 1]","peakP[90.0]",
-    "acmsF[60.,50.,80.]","betaF[0.05,0.01,0.08]","gammaF[0.1, 0, 1]","peakF[90.0]",
+    "meanP[-0.0,-5.0,5.0]","sigmaP[0.9,0.5,5.0]",
+    "meanF[-0.0,-5.0,5.0]","sigmaF[0.9,0.5,5.0]",
+    "acmsP[60.,50.,80.]","betaP[0.05,0.01,0.08]","gammaP[0.1, -2, 2]","peakP[90.0]",
+    "acmsF[60.,50.,80.]","betaF[0.05,0.01,0.08]","gammaF[0.1, -2, 2]","peakF[90.0]",
     ]
 
 tnpParAltSigFit = [
@@ -119,8 +119,8 @@ tnpParAltSigFit = [
     ]
      
 tnpParAltBkgFit = [
-    "meanP[-0.0,-5.0,5.0]","sigmaP[0.5,0.1,5.0]",
-    "meanF[-0.0,-5.0,5.0]","sigmaF[0.5,0.1,5.0]",
+    "meanP[-0.0,-5.0,5.0]","sigmaP[0.9,0.5,5.0]",
+    "meanF[-0.0,-5.0,5.0]","sigmaF[0.9,0.5,5.0]",
     "alphaP[0.,-5.,5.]",
     "alphaF[0.,-5.,5.]",
     ]

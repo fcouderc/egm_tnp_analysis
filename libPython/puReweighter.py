@@ -36,10 +36,8 @@ puMC = {
 }
 
 ### MC pu scenario to be used
-puMCscenario = 'Spring2016MC_PUscenarioV1'
-#puMCscenario = 'Moriond17MC_mix_2016'
-
-
+#puMCscenario = 'Spring2016MC_PUscenarioV1'
+puMCscenario = 'Moriond17MC_mix_2016'
 puDirEOS = 'eos/cms//store/group/phys_egamma/tnp/80X/pu/'
 
 #### Compute weights for all data epoch specified below

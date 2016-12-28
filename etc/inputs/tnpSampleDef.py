@@ -6,19 +6,20 @@ eosDir2 = 'eos/cms/store/group/phys_egamma/tnp/80X/PhoEleIDs/v2/'
 eosDirREC = 'eos/cms/store/group/phys_egamma/tnp/80X/RecoSF/RECOSFs_2016/'
 eosWinter17 = 'eos/cms/store/group/phys_egamma/tnp/80X/PhoEleIDs/Moriond17_v1/'
 Moriond17_80X = {
+    ### MiniAOD TnP for IDs scale factors
+    'DY_madgraph'          : tnpSample('DY_madgraph',
+                                       eosWinter17 + 'mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_DYToLL_madgraph_Spring16_reHLT.root',
+                                       isMC = True, nEvts = -1 ),
+    'DY_madgraph_Winter17' : tnpSample('DY_madgraph_Winter17', 
+                                       eosWinter17 + 'mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_DYToLL_madgraph_Moriond17.root',
+                                       isMC = True, nEvts = 48652793 ),
+    'DY_amcatnlo_Winter17' : tnpSample('DY_amcatnlo_Winter17', 
+                                       eosWinter17 + 'mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_DYToLL_mcAtNLO_Moriond17.root',
+                                       isMC = True, nEvts = 28968252 ),
+    'Wj_madgraph_Winter17' : tnpSample('Wj_madgraph_Winter17', 
+                                       eosWinter17 + 'mc/TnPTree_WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_WJets_madgraph_Moriond17.root',
+                                       isMC = True, nEvts = 29048609 ),
 
-#    'DY_madgraph' : tnpSample('DY_madgraph', eosDir1 + 'mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_DYToLL_madgraph.root', 
-#                              isMC = True, nEvts = 33584160 ),
-#    'data_Run2016B' : tnpSample('data_Run2016B' , eosDir2 + 'data/TnPTree_SingleElectron_2016rereco_RunB.root' , lumi = 5.349 ),
-#    'data_Run2016C' : tnpSample('data_Run2016C' , eosDir2 + 'data/TnPTree_SingleElectron_2016rereco_RunC.root' , lumi = 2.363 ),
-#    'data_Run2016D' : tnpSample('data_Run2016D' , eosDir2 + 'data/TnPTree_SingleElectron_2016rereco_RunD.root' , lumi = 4.256 ),
-#    'data_Run2016E' : tnpSample('data_Run2016E' , eosDir2 + 'data/TnPTree_SingleElectron_2016rereco_RunE.root' , lumi = 3.981 ),
-#    'data_Run2016F' : tnpSample('data_Run2016F' , eosDir2 + 'data/TnPTree_SingleElectron_2016rereco_RunF.root' , lumi = 3.105 ),
-#    'data_Run2016G' : tnpSample('data_Run2016G' , eosDir2 + 'data/TnPTree_SingleElectron_2016rereco_RunG.root' , lumi = 7.544 ),
-#    'data_Run2016H' : tnpSample('data_Run2016H' , eosDir2 + 'data/TnPTree_SingleElectron_2016prompt_RunH.root' , lumi = 6.105 ),
-
-    'DY_madgraph'   : tnpSample('DY_madgraph', eosWinter17 + 'mc//TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_DYToLL_madgraph_Spring16_reHLT.root',
-                                isMC = True, nEvts = -1 ),
     'data_Run2016B' : tnpSample('data_Run2016B' , eosWinter17 + 'data/TnPTree_SingleElectron_2016rereco_RunB.root' , lumi = 5.767 ),
     'data_Run2016C' : tnpSample('data_Run2016C' , eosWinter17 + 'data/TnPTree_SingleElectron_2016rereco_RunC.root' , lumi = 2.646 ),
     'data_Run2016D' : tnpSample('data_Run2016D' , eosWinter17 + 'data/TnPTree_SingleElectron_2016rereco_RunD.root' , lumi = 4.353 ),
@@ -29,9 +30,13 @@ Moriond17_80X = {
 
     
 
-    ### AOD TnP for gsfTracking scale factors
-    'DY_madgraph_MCWinter17_rec' : tnpSample('DY_madgraph_MCWinter17_rec'  , eosDirREC + 'mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_DYToLL_madgraph_Winter2017.root',
-                                             isMC = True, nEvts = 49748967),
+    ### AOD TnP for RECO scale factors
+    'DY_madgraph_Winter17_rec' : tnpSample('DY_madgraph_Winter17_rec'  , 
+                                           eosDirREC + 'mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_DYToLL_madgraph_Winter2017.root',
+                                           isMC = True, nEvts = 49748967),
+    'DY_amcatnlo_Winter17_rec' : tnpSample('DY_amcatnlo_Winter17_rec'  , 
+                                           eosDirREC + 'mc/TnPTree_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_DYToLL_mcAtNLO_Winter2017.root',
+                                           isMC = True, nEvts = 28658054),    
     'data_Run2016B_rec' : tnpSample('data_Run2016B_rec', eosDirREC + 'data/TnPTree_SingleElectron_2016rereco_RunB.root', lumi = 5.899),
     'data_Run2016C_rec' : tnpSample('data_Run2016C_rec', eosDirREC + 'data/TnPTree_SingleElectron_2016rereco_RunC.root', lumi = 2.646),
     'data_Run2016D_rec' : tnpSample('data_Run2016D_rec', eosDirREC + 'data/TnPTree_SingleElectron_2016rereco_RunD.root', lumi = 4.353),
