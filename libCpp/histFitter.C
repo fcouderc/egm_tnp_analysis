@@ -54,7 +54,14 @@ tnpFitter::tnpFitter(TFile *filein, std::string histname   ) : _useMinos(false),
   TH1 *hFail = (TH1*) filein->Get(TString::Format("%s_Fail",histname.c_str()).Data());
   _nTotP = hPass->Integral();
   _nTotF = hFail->Integral();
-
+  /// MC histos are done between 50-130 to do the convolution properly
+  /// but when doing MC fit in 60-120, need to zero bins outside the range
+  for( int ib = 0; ib <= hPass->GetXaxis()->GetNbins()+1; ib++ )
+   if(  hPass->GetXaxis()->GetBinCenter(ib) <= 60 || hPass->GetXaxis()->GetBinCenter(ib) >= 120 ) {
+     hPass->SetBinContent(ib,0);
+     hFail->SetBinContent(ib,0);
+   }
+  
   _work = new RooWorkspace("w") ;
   _work->factory("x[50,130]");
 
@@ -71,6 +78,13 @@ tnpFitter::tnpFitter(TH1 *hPass, TH1 *hFail, std::string histname  ) : _useMinos
 
   _nTotP = hPass->Integral();
   _nTotF = hFail->Integral();
+  /// MC histos are done between 50-130 to do the convolution properly
+  /// but when doing MC fit in 60-120, need to zero bins outside the range
+  for( int ib = 0; ib <= hPass->GetXaxis()->GetNbins()+1; ib++ )
+   if(  hPass->GetXaxis()->GetBinCenter(ib) <= 60 || hPass->GetXaxis()->GetBinCenter(ib) >= 120 ) {
+     hPass->SetBinContent(ib,0);
+     hFail->SetBinContent(ib,0);
+   }
 
   _work = new RooWorkspace("w") ;
   _work->factory("x[50,130]");
@@ -118,8 +132,10 @@ void tnpFitter::fits(bool mcTruth,string title) {
   if( mcTruth ) {
     _work->var("nBkgP")->setVal(0); _work->var("nBkgP")->setConstant();
     _work->var("nBkgF")->setVal(0); _work->var("nBkgF")->setConstant();
-    if( _work->var("sosP")  ) _work->var("sosP")->setConstant();
-    if( _work->var("sosF")  ) _work->var("sosF")->setConstant();
+    if( _work->var("sosP")   ) { _work->var("sosP")->setVal(0);
+      _work->var("sosP")->setConstant(); }
+    if( _work->var("sosF")   ) { _work->var("sosF")->setVal(0);
+      _work->var("sosF")->setConstant(); }
     if( _work->var("acmsP")  ) _work->var("acmsP")->setConstant();
     if( _work->var("acmsF")  ) _work->var("acmsF")->setConstant();
     if( _work->var("betaP")  ) _work->var("betaP")->setConstant();

@@ -23,7 +23,7 @@ def ptMin( tnpBin ):
 def createWorkspaceForAltSig( sample, tnpBin, tnpWorkspaceParam ):
 
     ### tricky: use n < 0 for high pT bin (so need to remove param and add it back)
-    cbNList = ['nP','nF']
+    cbNList = ['tailLeft']
     ptmin = ptMin(tnpBin)        
     if ptmin >= 35 :
         for par in cbNList:
@@ -32,9 +32,8 @@ def createWorkspaceForAltSig( sample, tnpBin, tnpWorkspaceParam ):
                 listToRM = filter(x.match, tnpWorkspaceParam)
                 for ir in listToRM :
                     print '**** remove', ir
-                    tnpWorkspaceParam.remove(ir)
-                    
-            tnpWorkspaceParam.append( '%s[-1,-3,-0.005]' % (par) )                
+                    tnpWorkspaceParam.remove(ir)                    
+            tnpWorkspaceParam.append( 'tailLeft[-1]' )
 
     if sample.isMC:
         return tnpWorkspaceParam
@@ -141,8 +140,9 @@ def histFitterAltSig( sample, tnpBin, tnpWorkspaceParam ):
     tnpWorkspacePar = createWorkspaceForAltSig( sample,  tnpBin, tnpWorkspaceParam )
 
     tnpWorkspaceFunc = [
-        "RooCBExGaussShape::sigResPass(x,meanP,expr('sqrt(sigmaP*sigmaP+sosP*sosP)',{sigmaP,sosP}),alphaP,nP, expr('sqrt(sigmaP_2*sigmaP_2+sosP*sosP)',{sigmaP_2,sosP}))",
-        "RooCBExGaussShape::sigResFail(x,meanF,expr('sqrt(sigmaF*sigmaF+sosF*sosF)',{sigmaF,sosF}),alphaF,nF, expr('sqrt(sigmaF_2*sigmaF_2+sosF*sosF)',{sigmaF_2,sosF}))",
+        "tailLeft[1]",
+        "RooCBExGaussShape::sigResPass(x,meanP,expr('sqrt(sigmaP*sigmaP+sosP*sosP)',{sigmaP,sosP}),alphaP,nP, expr('sqrt(sigmaP_2*sigmaP_2+sosP*sosP)',{sigmaP_2,sosP}),tailLeft)",
+        "RooCBExGaussShape::sigResFail(x,meanF,expr('sqrt(sigmaF*sigmaF+sosF*sosF)',{sigmaF,sosF}),alphaF,nF, expr('sqrt(sigmaF_2*sigmaF_2+sosF*sosF)',{sigmaF_2,sosF}),tailLeft)",
         "RooCMSShape::bkgPass(x, acmsP, betaP, gammaP, peakP)",
         "RooCMSShape::bkgFail(x, acmsF, betaF, gammaF, peakF)",
         ]
