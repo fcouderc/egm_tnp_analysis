@@ -3,7 +3,7 @@
 
 ## Install stable branch
 
-> git clone -b egm_tnp_Moriond17 git@github.com:fcouderc/egm_tnp_analysis.git 
+> git clone -b egm_tnp_Moriond17_v2.0 git@github.com:fcouderc/egm_tnp_analysis.git 
 
 > cd egm_tnp_analysis
 
