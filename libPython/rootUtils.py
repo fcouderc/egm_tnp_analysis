@@ -62,13 +62,20 @@ def makePassFailHistograms( sample, flag, bindef, var ):
         hPass[ib].Write(hPass[ib].GetName())
         hFail[ib].Write(hFail[ib].GetName())
 
-        passI = hPass[ib].Integral()
-        failI = hFail[ib].Integral()
-        eff = 0
+        bin1 = 1
+        bin2 = hPass[ib].GetXaxis().GetNbins()
+        epass = rt.Double(-1.0)
+        efail = rt.Double(-1.0)
+        passI = hPass[ib].IntegralAndError(bin1,bin2,epass)
+        failI = hFail[ib].IntegralAndError(bin1,bin2,efail)
+        eff   = 0
+        e_eff = 0
         if passI > 0 :
-            eff = passI / (passI+failI)
+            itot  = (passI+failI)
+            eff   = passI / (passI+failI)
+            e_eff = math.sqrt(passI*passI*efail*efail + failI*failI*epass*epass) / (itot*itot)
         print cuts
-        print '    ==> pass: %.1f ; fail : %.1f : eff: %1.3f' % (passI,failI,eff)
+        print '    ==> pass: %.1f +/- %.1f ; fail : %.1f +/- %.1f : eff: %1.3f +/- %1.3f' % (passI,epass,failI,efail,eff,e_eff)
     outfile.Close()
 
 
@@ -102,11 +109,12 @@ def getAllEffi( info, bindef ):
         rootfile = rt.TFile( info['mcNominal'], 'read' )
         hP = rootfile.Get('%s_Pass'%bindef['name'])
         hF = rootfile.Get('%s_Fail'%bindef['name'])
-
-        nP = hP.Integral()
-        nF = hF.Integral()
-        eP = math.sqrt(hP.GetEntries())/hP.GetEntries() * nP
-        eF = math.sqrt(hF.GetEntries())/hF.GetEntries() * nF
+        bin1 = 1
+        bin2 = hP[ib].GetXaxis().GetNbins()
+        eP = rt.Double(-1.0)
+        eF = rt.Double(-1.0)
+        nP = hP.IntegralAndError(bin1,bin2,eP)
+        nF = hF.IntegralAndError(bin1,bin2,eF)
 
         effis['mcNominal'] = computeEffi(nP,nF,eP,eF)
         rootfile.Close()
@@ -116,11 +124,12 @@ def getAllEffi( info, bindef ):
         rootfile = rt.TFile( info['tagSel'], 'read' )
         hP = rootfile.Get('%s_Pass'%bindef['name'])
         hF = rootfile.Get('%s_Fail'%bindef['name'])
-        nP = hP.Integral()
-        nF = hF.Integral()
-
-        eP = math.sqrt(hP.GetEntries())/hP.GetEntries() * nP
-        eF = math.sqrt(hF.GetEntries())/hF.GetEntries() * nF
+        bin1 = 1
+        bin2 = hP[ib].GetXaxis().GetNbins()
+        eP = rt.Double(-1.0)
+        eF = rt.Double(-1.0)
+        nP = hP.IntegralAndError(bin1,bin2,eP)
+        nF = hF.IntegralAndError(bin1,bin2,eF)
 
         effis['tagSel'] = computeEffi(nP,nF,eP,eF)
         rootfile.Close()
@@ -130,11 +139,12 @@ def getAllEffi( info, bindef ):
         rootfile = rt.TFile( info['mcAlt'], 'read' )
         hP = rootfile.Get('%s_Pass'%bindef['name'])
         hF = rootfile.Get('%s_Fail'%bindef['name'])
-        nP = hP.Integral()
-        nF = hF.Integral()
-
-        eP = math.sqrt(hP.GetEntries())/hP.GetEntries() * nP
-        eF = math.sqrt(hF.GetEntries())/hF.GetEntries() * nF
+        bin1 = 1
+        bin2 = hP[ib].GetXaxis().GetNbins()
+        eP = rt.Double(-1.0)
+        eF = rt.Double(-1.0)
+        nP = hP.IntegralAndError(bin1,bin2,eP)
+        nF = hF.IntegralAndError(bin1,bin2,eF)
 
         effis['mcAlt'] = computeEffi(nP,nF,eP,eF)
         rootfile.Close()
