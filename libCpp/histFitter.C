@@ -152,10 +152,10 @@ void tnpFitter::fits(bool mcTruth,string title) {
 
   /// FC: seems to be better to change the actual range than using a fitRange in the fit itself (???)
   /// FC: I don't know why but the integral is done over the full range in the fit not on the reduced range
-  //  _work->var("x")->setRange("fitMassRange",60,120);
   _work->var("x")->setRange(_xFitMin,_xFitMax);
-  //  RooFitResult* resPass = pdfPass->fitTo(*_work->data("hPass"),Minos(_useMinos),SumW2Error(kTRUE),Save(),Range("fitMassRange"));
-  RooFitResult* resPass = pdfPass->fitTo(*_work->data("hPass"),Minos(_useMinos),SumW2Error(kTRUE),Save());
+  _work->var("x")->setRange("fitMassRange",_xFitMin,_xFitMax);
+  RooFitResult* resPass = pdfPass->fitTo(*_work->data("hPass"),Minos(_useMinos),SumW2Error(kTRUE),Save(),Range("fitMassRange"));
+  //RooFitResult* resPass = pdfPass->fitTo(*_work->data("hPass"),Minos(_useMinos),SumW2Error(kTRUE),Save());
   if( _fixSigmaFtoSigmaP ) {
     _work->var("sigmaF")->setVal( _work->var("sigmaP")->getVal() );
     _work->var("sigmaF")->setConstant();
@@ -163,8 +163,8 @@ void tnpFitter::fits(bool mcTruth,string title) {
 
   _work->var("sigmaF")->setVal(_work->var("sigmaP")->getVal());
   _work->var("sigmaF")->setRange(0.8* _work->var("sigmaP")->getVal(), 3.0* _work->var("sigmaP")->getVal());
-  //  RooFitResult* resFail = pdfFail->fitTo(*_work->data("hFail"),Minos(_useMinos),SumW2Error(kTRUE),Save(),Range("fitMassRange"));
-  RooFitResult* resFail = pdfFail->fitTo(*_work->data("hFail"),Minos(_useMinos),SumW2Error(kTRUE),Save());
+  RooFitResult* resFail = pdfFail->fitTo(*_work->data("hFail"),Minos(_useMinos),SumW2Error(kTRUE),Save(),Range("fitMassRange"));
+  //RooFitResult* resFail = pdfFail->fitTo(*_work->data("hFail"),Minos(_useMinos),SumW2Error(kTRUE),Save());
 
 
   RooPlot *pPass = _work->var("x")->frame(60,120);
