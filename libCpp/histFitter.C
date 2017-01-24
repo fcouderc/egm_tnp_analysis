@@ -36,7 +36,8 @@ public:
   void textParForCanvas(RooFitResult *resP, RooFitResult *resF, TPad *p);
   
   void fixSigmaFtoSigmaP(bool fix=true) { _fixSigmaFtoSigmaP= fix;}
-  
+
+  void setFitRange(double xMin,double xMax) { _xFitMin = xMin; _xFitMax = xMax; }
 private:
   RooWorkspace *_work;
   std::string _histname_base;
@@ -44,6 +45,7 @@ private:
   double _nTotP, _nTotF;
   bool _useMinos;
   bool _fixSigmaFtoSigmaP;
+  double _xFitMin,_xFitMax;
 };
 
 tnpFitter::tnpFitter(TFile *filein, std::string histname   ) : _useMinos(false),_fixSigmaFtoSigmaP(false) {
@@ -69,30 +71,34 @@ tnpFitter::tnpFitter(TFile *filein, std::string histname   ) : _useMinos(false),
   RooDataHist rooFail("hFail","hFail",*_work->var("x"),hFail);
   _work->import(rooPass) ;
   _work->import(rooFail) ;
-
+  _xFitMin = 60;
+  _xFitMax = 120;
 }
 
 tnpFitter::tnpFitter(TH1 *hPass, TH1 *hFail, std::string histname  ) : _useMinos(false),_fixSigmaFtoSigmaP(false) {
   RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING);
   _histname_base = histname;
-
+  
   _nTotP = hPass->Integral();
   _nTotF = hFail->Integral();
   /// MC histos are done between 50-130 to do the convolution properly
   /// but when doing MC fit in 60-120, need to zero bins outside the range
   for( int ib = 0; ib <= hPass->GetXaxis()->GetNbins()+1; ib++ )
-   if(  hPass->GetXaxis()->GetBinCenter(ib) <= 60 || hPass->GetXaxis()->GetBinCenter(ib) >= 120 ) {
-     hPass->SetBinContent(ib,0);
-     hFail->SetBinContent(ib,0);
-   }
-
+    if(  hPass->GetXaxis()->GetBinCenter(ib) <= 60 || hPass->GetXaxis()->GetBinCenter(ib) >= 120 ) {
+      hPass->SetBinContent(ib,0);
+      hFail->SetBinContent(ib,0);
+    }
+  
   _work = new RooWorkspace("w") ;
   _work->factory("x[50,130]");
-
+  
   RooDataHist rooPass("hPass","hPass",*_work->var("x"),hPass);
   RooDataHist rooFail("hFail","hFail",*_work->var("x"),hFail);
   _work->import(rooPass) ;
   _work->import(rooFail) ;
+  _xFitMin = 60;
+  _xFitMax = 120;
+  
 }
 
 
@@ -147,7 +153,7 @@ void tnpFitter::fits(bool mcTruth,string title) {
   /// FC: seems to be better to change the actual range than using a fitRange in the fit itself (???)
   /// FC: I don't know why but the integral is done over the full range in the fit not on the reduced range
   //  _work->var("x")->setRange("fitMassRange",60,120);
-  _work->var("x")->setRange(60,120);
+  _work->var("x")->setRange(_xFitMin,_xFitMax);
   //  RooFitResult* resPass = pdfPass->fitTo(*_work->data("hPass"),Minos(_useMinos),SumW2Error(kTRUE),Save(),Range("fitMassRange"));
   RooFitResult* resPass = pdfPass->fitTo(*_work->data("hPass"),Minos(_useMinos),SumW2Error(kTRUE),Save());
   if( _fixSigmaFtoSigmaP ) {

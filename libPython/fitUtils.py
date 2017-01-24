@@ -214,6 +214,7 @@ def histFitterAltBkg( sample, tnpBin, tnpWorkspaceParam ):
     ## setup
     rootfile = rt.TFile(sample.altBkgFit,'update')
     fitter.setOutputFile( rootfile )
+#    fitter.setFitRange(65,115)
 
     ## generated Z LineShape
     ## for high pT change the failing spectra to any probe to get statistics
